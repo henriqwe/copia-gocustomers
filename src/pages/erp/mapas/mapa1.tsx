@@ -109,73 +109,6 @@ export function Page() {
       engineRunning: true
     }
   ]
-  const currentRouteMap2 = [
-    {
-      //a
-      location: { lat: -5.884947333509144, lng: -35.24594699140512 },
-      rotation: 230
-    },
-    {
-      //b
-      location: { lat: -5.8862443458657525, lng: -35.24971282416306 },
-      marker: false,
-      rotation: 200
-    },
-    {
-      //c
-      location: { lat: -5.890377103437126, lng: -35.250307146900525 },
-      marker: false,
-      rotation: 260
-    },
-    {
-      //d
-      location: { lat: -5.8912789026834576, lng: -35.25429827396411 },
-      marker: false,
-      rotation: 250
-    },
-    {
-      //e
-      location: { lat: -5.8912575583410804, lng: -35.25862199464405 },
-      marker: false,
-      rotation: 20
-    },
-    {
-      //f
-      location: { lat: -5.8947366753373425, lng: -35.25784951851657 },
-      marker: false,
-      rotation: 200
-    },
-    {
-      //g
-      location: { lat: -5.8984187316483805, lng: -35.258721173093186 },
-      stopover: true,
-      rotation: 200
-    },
-    {
-      //h
-      location: { lat: -5.903303388787477, lng: -35.259807721749056 },
-      stopover: false,
-      marker: false,
-      rotation: 200
-    },
-    {
-      //i
-      location: { lat: -5.908957265850644, lng: -35.261083602587675 },
-      marker: false,
-      rotation: 200
-    },
-    {
-      //j
-      location: { lat: -5.91249749638632, lng: -35.26192445763266 },
-      marker: false,
-      rotation: 200
-    },
-    {
-      //k
-      location: { lat: -5.91249749638622, lng: -35.26192445763266 },
-      rotation: 200
-    }
-  ]
   const addicionalPathCoords = [
     [
       {
@@ -415,6 +348,7 @@ export function Page() {
       }
     ]
   ]
+
   let noConection = false
   let google: any
   let line: google.maps.Polyline
@@ -477,7 +411,8 @@ export function Page() {
   function initMap(pathCoords: locationProps[]) {
     const loader = new Loader({
       apiKey: 'AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I',
-      version: 'weekly'
+      version: 'weekly',
+      libraries: ['geometry']
     })
     const styles = [
       {
@@ -529,32 +464,30 @@ export function Page() {
           map
         })
 
-        setTimeout(() => {
-          line.getPath().clear()
-          renderPolylineToInitialPos(currentPos)
-          recursiveAnimate()
+        line.getPath().clear()
+        renderPolylineToInitialPos(currentPos)
+        recursiveAnimate()
 
-          marker.setMap(map)
-          //marker inicio
-          new google.maps.Marker({
-            position: pathCoords[0],
-            map,
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 5,
-              strokeWeight: 0,
-              fillColor: '#000',
-              fillOpacity: 1
-            },
-            label: {
-              text: 'Comigo Rastreamento',
-              color: 'black',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              className: 'mb-12'
-            }
-          })
-        }, 100)
+        marker.setMap(map)
+        //marker inicio
+        new google.maps.Marker({
+          position: pathCoords[0],
+          map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 5,
+            strokeWeight: 0,
+            fillColor: '#000',
+            fillOpacity: 1
+          },
+          label: {
+            text: 'Comigo Rastreamento',
+            color: 'black',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            className: 'mb-12'
+          }
+        })
       })
       .catch((e) => {
         console.log('error: ', e)
@@ -613,7 +546,6 @@ export function Page() {
       }
     }, timePerStep)
   }
-
   function renderPolylineToInitialPos(index: number) {
     const paths = pathCoords.slice(0, index + 1)
     paths.forEach((path) => {
@@ -629,7 +561,6 @@ export function Page() {
 
     flightPath.setMap(map)
   }
-
   function moveMarker(
     marker: google.maps.Marker,
     departure: google.maps.LatLng,
@@ -687,9 +618,10 @@ export function Page() {
       infowindow.close()
     })
   }
+
   useEffect(() => {
     initMap(pathCoords)
-    initMap2(currentRouteMap2)
+    initMap3()
     setInterval(() => {
       if (addicionalPathCoords.length > 0) {
         addPathCoords()
@@ -706,7 +638,7 @@ export function Page() {
         renderPolylineToInitialPos(currentPos)
         recursiveAnimate()
       }
-    }, 10000)
+    }, 1000)
   }, [])
 
   return (
@@ -714,20 +646,88 @@ export function Page() {
       title="Mapa"
       noGrid={true}
       currentLocation={[
-        { title: 'Rastreamento', url: rotas.erp.home },
-        { title: 'Mapa', url: rotas.erp.mapa }
+        { title: 'Mapas', url: rotas.erp.mapas.mapa1 },
+        { title: 'Mapa 1', url: rotas.erp.mapas.mapa1 }
       ]}
     >
       <div className="w-full h-2/3 mb-2 z-10" id="map1"></div>
-      <div className="w-full h-2/3 mb-2 z-10" id="map2"></div>
+      <div className="w-full h-2/3 mb-2 z-10" id="map3"></div>
     </Base>
   )
 }
 
-function initMap2(currentRoute: currentRouteProps) {
+function initMap3() {
+  const currentRoute = [
+    {
+      //a
+      location: { lat: -5.884947333509144, lng: -35.24594699140512 },
+      rotation: 230
+    },
+    {
+      //b
+      location: { lat: -5.8862443458657525, lng: -35.24971282416306 },
+      marker: false,
+      rotation: 200
+    },
+    {
+      //c
+      location: { lat: -5.890377103437126, lng: -35.250307146900525 },
+      marker: false,
+      rotation: 260
+    },
+    {
+      //d
+      location: { lat: -5.8912789026834576, lng: -35.25429827396411 },
+      marker: false,
+      rotation: 250
+    },
+    {
+      //e
+      location: { lat: -5.8912575583410804, lng: -35.25862199464405 },
+      marker: false,
+      rotation: 20
+    },
+    {
+      //f
+      location: { lat: -5.8947366753373425, lng: -35.25784951851657 },
+      marker: false,
+      rotation: 200
+    },
+    {
+      //g
+      location: { lat: -5.8984187316483805, lng: -35.258721173093186 },
+      stopover: true,
+      rotation: 200
+    },
+    {
+      //h
+      location: { lat: -5.903303388787477, lng: -35.259807721749056 },
+      stopover: false,
+      marker: false,
+      rotation: 200
+    },
+    {
+      //i
+      location: { lat: -5.908957265850644, lng: -35.261083602587675 },
+      marker: false,
+      rotation: 200
+    },
+    {
+      //j
+      location: { lat: -5.91249749638632, lng: -35.26192445763266 },
+      marker: false,
+      rotation: 200
+    },
+    {
+      //k
+      location: { lat: -5.91249749638622, lng: -35.26192445763266 },
+      rotation: 200
+    }
+  ]
   const loader = new Loader({
     apiKey: 'AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I',
-    version: 'weekly'
+    version: 'weekly',
+    libraries: ['geometry']
   })
   const mapOptions = {
     center: currentRoute[0].location,
@@ -745,12 +745,11 @@ function initMap2(currentRoute: currentRouteProps) {
     }
   ]
 
-  //map2
   loader
     .load()
     .then((google) => {
       const map: google.maps.Map = new google.maps.Map(
-        document.getElementById('map2') as HTMLElement,
+        document.getElementById('map3') as HTMLElement,
         mapOptions
       )
 
@@ -785,7 +784,6 @@ function initMap2(currentRoute: currentRouteProps) {
       console.log('error: ', e)
     })
 }
-
 function calculateAndDisplayRoute(
   directionsService: google.maps.DirectionsService,
   directionsRenderer: google.maps.DirectionsRenderer,
@@ -812,6 +810,7 @@ function calculateAndDisplayRoute(
       optimizeWaypoints: true
     })
     .then((response: any) => {
+      console.log(response)
       directionsRenderer.setDirections(response)
     })
     .catch((e: any) => console.log('Directions request failed due to ' + e))
