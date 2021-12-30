@@ -1,0 +1,167 @@
+/* TailwindCSS Directives */
+@import "tailwind";
+@import 'react-toastify/dist/ReactToastify.css';
+
+/* Fonts */
+@import "fonts/roboto";
+
+/* Breakpoints */
+@import "~@left4code/tw-starter/dist/scss/breakpoint";
+
+/* Mixins */
+@import "~@left4code/tw-starter/dist/scss/mixins/media";
+
+/* Packages
+@import "~@left4code/tw-starter/dist/scss/accordion"
+@import "~@left4code/tw-starter/dist/scss/alert";*/;
+@import "~@left4code/tw-starter/dist/scss/btn";
+@import "~@left4code/tw-starter/dist/scss/dropdown";
+/* @import "~@left4code/tw-starter/dist/scss/file";
+@import "~@left4code/tw-starter/dist/scss/form-check";*/
+@import "~@left4code/tw-starter/dist/scss/form-control";
+/* @import "~@left4code/tw-starter/dist/scss/form-help";
+@import "~@left4code/tw-starter/dist/scss/form-inline";
+@import "~@left4code/tw-starter/dist/scss/form-label";*/
+@import "~@left4code/tw-starter/dist/scss/form-select";
+/* @import "~@left4code/tw-starter/dist/scss/image-fit";
+@import "~@left4code/tw-starter/dist/scss/input-group";*/
+@import "~@left4code/tw-starter/dist/scss/intro";
+/* @import "~@left4code/tw-starter/dist/scss/modal";*/
+@import "~@left4code/tw-starter/dist/scss/pagination";
+@import "~@left4code/tw-starter/dist/scss/progress";
+@import "~@left4code/tw-starter/dist/scss/scrollbar";
+/* @import "~@left4code/tw-starter/dist/scss/tab";*/
+@import "~@left4code/tw-starter/dist/scss/table";
+/* @import "~@left4code/tw-starter/dist/scss/typing-dots";
+@import "~@left4code/tw-starter/dist/scss/zoom-in";*/
+@import "~@left4code/tw-starter/dist/scss/box";
+
+/* Components */
+@import "components/global";
+@import "components/main";
+@import "components/top-bar";
+@import "components/login";
+@import "components/table-report";
+/* @import "components/report-timeline";
+@import "components/report-chart";
+@import "components/search";
+@import "components/notification";
+@import "components/report-box";
+@import "components/report-box-2";
+@import "components/report-box-3";
+@import "components/report-box-4";*/
+@import "components/content";
+/* @import "components/top-nav";*/
+@import "components/side-nav";
+@import "components/breadcrumb";
+/* @import "components/toastify";
+@import "components/toastify-content";
+@import "components/feather-icon";
+@import "components/top-bar-boxed";
+@import "components/mobile-menu";
+@import "components/inbox-filter";
+@import "components/inbox";
+@import "components/chat";
+@import "components/boxed-tabs";
+@import "components/chat-dropdown";
+@import "components/wizard";
+@import "components/blog";
+@import "components/news";
+@import "components/pricing-tabs";
+@import "components/error-page";
+@import "components/search-result";
+@import "components/notification-content";
+@import "components/report-maps";
+@import "components/pos-dropdown";
+@import "components/pos";
+@import "components/post";
+@import "components/litepicker";
+@import "components/tiny-slider";
+@import "components/tippy";
+@import "components/tabulator";
+@import "components/tom-select";
+@import "components/dropzone";
+@import "components/ckeditor";
+@import "components/zoom-vanilla";
+@import "components/dark-mode-switcher";
+@import "components/hljs";
+@import "components/source-preview";
+@import "components/ads-box";
+@import "components/pristine";*/
+@import "components/full-calendar";
+
+/* personalizar a barra em geral, aqui estou definindo 10px de largura para a barra vertical
+e 10px de altura para a barra horizontal */
+::-webkit-scrollbar {
+    width:2px;
+    height: 2px;
+  }
+
+  /* aqui é para personalizar o fundo da barra, neste caso estou colocando um fundo cinza escuro*/
+  ::-webkit-scrollbar-track {
+    background:#333;
+  }
+
+  /* aqui é a alça da barra, que demonstra a altura que você está na página
+  estou colocando uma cor azul clara nela*/
+  ::-webkit-scrollbar-thumb {
+    background: #cacaca;
+  }
+
+  .table-report {
+    &:not(.table-report--bordered):not(.table-report--tabulator) {
+      tbody {
+        tr {
+          @apply bg-white dark:bg-dark-3 hover:bg-theme-17 dark:hover:bg-dark-5;
+          box-shadow: 20px 3px 20px #0000000b;
+            td {
+              box-shadow: none;
+              @apply bg-transparent
+            }
+        }
+      }
+    }
+  }
+
+  * > .intro-y:nth-child(1){
+    z-index: 1;
+  }
+
+  .breadcrumb .breadcrumb--active{
+    cursor: pointer;
+  }
+
+  .toggle-checkbox:checked {
+    @apply right-0 border-dark-1;
+    right: 0;
+    border-color: rgba(41, 49, 69, var(--tw-border-opacity));
+  }
+  .toggle-checkbox:checked + .toggle-label {
+    @apply bg-dark-1;
+    background-color: rgba(41, 49, 69, var(--tw-border-opacity));
+  }
+
+  .react-kanban-board{
+    @apply pl-0
+  }
+
+  .react-kanban-card{
+    @apply dark:bg-dark-2 rounded-md
+  }
+
+  .react-kanban-column{
+    @apply dark:bg-dark-3 bg-gray-400 rounded-md ml-0 mr-4
+  }
+ .report-timeline {
+        &:before {
+            content: "";
+            height: 95%;
+            @apply w-px bg-theme-5 absolute ml-5 mt-5 dark:bg-dark-5;
+        }
+        .report-timeline__image {
+            &:before {
+                content: "";
+                @apply w-20 h-px bg-theme-5 absolute mt-5 ml-10 dark:bg-dark-5 ;
+            }
+        }
+    }

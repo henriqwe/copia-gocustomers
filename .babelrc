@@ -1,0 +1,13 @@
+{
+  "presets": ["next/babel", "@babel/preset-typescript"],
+  "overrides": [{
+    "include": [
+      "./node_modules"
+    ],
+    "plugins": [
+      ["babel-plugin-transform-import-ignore", {
+        "extensions": [".css"]
+      }]
+    ]
+  }]
+}

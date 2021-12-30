@@ -1,0 +1,10 @@
+POST http://localhost:8080/v1/metadata
+Content-Type: application/json
+X-Hasura-Role: admin
+X-Hasura-Admin-Secret: myadminsecretkey
+
+{
+    "type" : "export_metadata",
+    "version": 2,
+    "args": {}
+}
