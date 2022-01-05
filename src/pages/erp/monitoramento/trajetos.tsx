@@ -16,7 +16,7 @@ type timerProps = {
   resume?: (() => void | undefined) | undefined
   timeoutCallback?: (() => void) | undefined
 }
-export default function Mapa() {
+export default function Trajetos() {
   return <Page />
 }
 
@@ -824,7 +824,7 @@ export function Page() {
       .load()
       .then((google) => {
         const map = new google.maps.Map(
-          document.getElementById('map1') as HTMLElement,
+          document.getElementById('googleMap') as HTMLElement,
           {
             center: {
               lat: pathCoordsCar1[0].lat,
@@ -869,14 +869,14 @@ export function Page() {
 
   return (
     <Base
-      title="Mapa 2"
+      title="Trajetos"
       noGrid={true}
       currentLocation={[
-        { title: 'Mapas', url: rotas.erp.mapas.mapa1 },
-        { title: 'Mapa 2', url: rotas.erp.mapas.mapa2 }
+        { title: 'Dashboard', url: rotas.erp.home },
+        { title: 'Trajetos', url: rotas.erp.monitoramento.trajetos }
       ]}
     >
-      <div className="w-full h-2/3 mb-2 z-10" id="map1"></div>
+      <div className="w-full h-full mb-2 z-10" id="googleMap"></div>
     </Base>
   )
 }

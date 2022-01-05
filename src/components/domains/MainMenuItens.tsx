@@ -1,28 +1,33 @@
-import { ChipIcon, DeviceMobileIcon, HomeIcon } from '@heroicons/react/outline'
+import { ChipIcon, HomeIcon } from '@heroicons/react/outline'
 import React from 'react'
 import rotas from './routes'
 
 export default {
   erp: [
     {
-      title: 'Início',
+      title: 'Dashboard',
       icon: <HomeIcon className="w-4 h-4 mx-4" />,
       url: rotas.erp.home,
       children: []
     },
     {
-      title: 'Mapas',
-      url: rotas.erp.mapas.mapa1,
+      title: 'Monitoramento',
+      url: rotas.erp.monitoramento.localizacao,
       icon: <ChipIcon className="w-4 h-4 mx-4" />,
       children: [
         {
-          title: 'Mapa 1',
-          url: rotas.erp.mapas.mapa1,
+          title: 'Localização',
+          url: rotas.erp.monitoramento.localizacao,
           icon: <ChipIcon className="w-4 h-4 mx-4" />
         },
         {
-          title: 'Mapa 2',
-          url: rotas.erp.mapas.mapa2,
+          title: 'Trajetos',
+          url: rotas.erp.monitoramento.trajetos,
+          icon: <ChipIcon className="w-4 h-4 mx-4" />
+        },
+        {
+          title: 'Comandos',
+          url: rotas.erp.monitoramento.comandos,
           icon: <ChipIcon className="w-4 h-4 mx-4" />
         }
       ]

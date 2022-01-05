@@ -1,9 +1,10 @@
 export default {
   erp: {
     home: '/erp',
-    mapas: {
-      mapa1: '/erp/mapas/mapa1',
-      mapa2: '/erp/mapas/mapa2'
+    monitoramento: {
+      localizacao: '/erp/monitoramento/localizacao',
+      trajetos: '/erp/monitoramento/trajetos',
+      comandos: '/erp/monitoramento/comandos'
     },
     index: '/erp'
   },

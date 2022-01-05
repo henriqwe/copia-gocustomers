@@ -25,7 +25,7 @@ type timerProps = {
   resume?: (() => void | undefined) | undefined
   timeoutCallback?: (() => void) | undefined
 }
-export default function Mapa() {
+export default function Localizacao() {
   return <Page />
 }
 
@@ -643,11 +643,11 @@ export function Page() {
 
   return (
     <Base
-      title="Mapa"
+      title="Localização"
       noGrid={true}
       currentLocation={[
-        { title: 'Mapas', url: rotas.erp.mapas.mapa1 },
-        { title: 'Mapa 1', url: rotas.erp.mapas.mapa1 }
+        { title: 'Dashboard', url: rotas.erp.home },
+        { title: 'Localização', url: rotas.erp.monitoramento.localizacao }
       ]}
     >
       <div className="w-full h-2/3 mb-2 z-10" id="map1"></div>
