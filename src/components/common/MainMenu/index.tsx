@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react'
 import Actions from '@/common/MainMenu/Actions'
 import Filters from '@/common/MainMenu/Filters'
 import Links from '@/common/MainMenu/Links'
-import router from 'next/router'
+import { useRouter } from 'next/router'
 import * as buttons from '@/common/Buttons'
 import * as icons from '@/common/Icons'
 import * as common from '@/common'
@@ -39,6 +39,7 @@ export default function MainMenu({
   search
 }: MainMenuProps) {
   const [disabledAll, setDisabledAll] = useState(false)
+  const router = useRouter()
   return (
     <div className="p-5 intro-y box">
       <div

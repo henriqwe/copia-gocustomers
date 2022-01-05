@@ -12,7 +12,7 @@ export default {
     },
     {
       title: 'Monitoramento',
-      url: rotas.erp.monitoramento.localizacao,
+      url: rotas.erp.monitoramento.index,
       icon: <ChipIcon className="w-4 h-4 mx-4" />,
       children: [
         {
