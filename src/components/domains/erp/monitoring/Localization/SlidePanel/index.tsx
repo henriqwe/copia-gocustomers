@@ -11,6 +11,7 @@ export default function SlidePanel() {
       handler={setSlidePanelState}
       formContent={<localizations.HistoricLocalization />}
       chevronDoubleRightIcon
+      noOverlay
     />
   )
 }

@@ -24,28 +24,33 @@ export default function Modal({
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-50 overflow-hidden"
-        onClose={() =>
+        className={`${noOverlay ? '' : 'inset-0'} fixed z-50 overflow-hidden`}
+        onClose={() => {
+          if (noOverlay) return
+
           handler((lastState: any) => {
             return {
               ...lastState,
               open: false
             }
           })
-        }
+        }}
       >
         <div className="absolute inset-0 overflow-hidden">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-in-out duration-500"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in-out duration-500"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <Dialog.Overlay className="absolute inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
-          </Transition.Child>
+          {!noOverlay && (
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="absolute inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
+            </Transition.Child>
+          )}
+
           <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
             <Transition.Child
               as={Fragment}
@@ -76,7 +81,7 @@ export default function Modal({
                       type="button"
                       className={` ${
                         chevronDoubleRightIcon
-                          ? 'btn dark:bg-dark-3 hover:outline-none focus:outline-none'
+                          ? 'rounded-l-md px-2 py-2 dark:bg-dark-3'
                           : 'text-gray-300 rounded-md hover:text-white focus:outline-none focus:ring-2 focus:ring-white'
                       }`}
                       onClick={() =>

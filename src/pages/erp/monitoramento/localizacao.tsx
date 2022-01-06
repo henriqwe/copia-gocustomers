@@ -256,9 +256,10 @@ export function Page() {
       <div className="absolute z-50 top-1/2 right-0">
         <localizations.InternalNavigation />
       </div>
-
       <localizations.SlidePanel />
-      <div className="w-full h-full" id="googleMaps"></div>
+      <div className="h-full w-full">
+        <div className="w-full h-full" id="googleMaps" />
+      </div>
     </MapTemplate>
   )
 }
