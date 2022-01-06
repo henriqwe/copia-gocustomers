@@ -10,6 +10,7 @@ export default function SlidePanel() {
       open={slidePanelState.open}
       handler={setSlidePanelState}
       formContent={<localizations.HistoricLocalization />}
+      chevronDoubleRightIcon
     />
   )
 }

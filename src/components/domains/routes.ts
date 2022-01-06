@@ -1,13 +1,13 @@
 export default {
   erp: {
+    home: '/erp',
     monitoramento: {
       localizacao: '/erp/monitoramento/localizacao',
       trajetos: '/erp/monitoramento/trajetos',
       comandos: '/erp/monitoramento/comandos',
       index: '/erp/monitoramento'
     },
-    index: '/erp',
-    home: '/erp'
+    index: '/erp'
   },
   assistencia: {
     home: '/assistencia/',

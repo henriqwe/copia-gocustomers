@@ -3,7 +3,7 @@ import * as localizations from '@/domains/erp/monitoring/Localization'
 
 import { Loader } from '@googlemaps/js-api-loader'
 import { useEffect } from 'react'
-import Base from '@/templates/Base'
+import MapTemplate from '@/templates/MapTemplate'
 
 type vehicle = {
   crs: string
@@ -102,9 +102,13 @@ export function Page() {
         )
         map.setOptions({ styles })
 
-        allUserVehicle?.map((vehicle) => {
-          createNewVehicleMarker(map, google, vehicle)
-        })
+        allUserVehicle
+          ?.filter((vehicle) => {
+            if (vehicle.latitude && vehicle.longitude) return vehicle
+          })
+          .map((vehicle) => {
+            createNewVehicleMarker(map, google, vehicle)
+          })
       })
       .catch((e) => {
         console.log('error: ', e)
@@ -241,19 +245,21 @@ export function Page() {
   }, [allUserVehicle])
 
   return (
-    <Base
+    <MapTemplate
       reload={{ action: localizationsRefetch, state: localizationsLoading }}
       title="Localização"
-      noGrid={true}
       currentLocation={[
         { title: 'Dashboard', url: rotas.erp.home },
         { title: 'Localização', url: rotas.erp.monitoramento.localizacao }
       ]}
     >
-      <localizations.InternalNavigation />
+      <div className="absolute z-50 top-1/2 right-0">
+        <localizations.InternalNavigation />
+      </div>
+
       <localizations.SlidePanel />
       <div className="w-full h-full" id="googleMaps"></div>
-    </Base>
+    </MapTemplate>
   )
 }
 
@@ -270,10 +276,10 @@ function createNewVehicleMarker(
       path: 'M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z',
       scale: 0.5,
       strokeWeight: 0.7,
-      fillColor: setVehiclecolor(vehicle),
+      fillColor: setVehicleColor(vehicle),
       fillOpacity: 1,
       anchor: new google.maps.Point(10, 25),
-      rotation: 0
+      rotation: Number(vehicle.crs)
     }
   })
 
@@ -297,7 +303,7 @@ function createNewVehicleMarker(
   })
 }
 
-function setVehiclecolor(vehicle: vehicle) {
+function setVehicleColor(vehicle: vehicle) {
   if (vehicle.ligado) {
     if (Number(vehicle.speed).toFixed() === '0') return '#22ade4'
 

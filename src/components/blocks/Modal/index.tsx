@@ -1,6 +1,6 @@
 import { Fragment, ReactNode } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { XIcon } from '@heroicons/react/outline'
+import { ChevronDoubleRightIcon, XIcon } from '@heroicons/react/outline'
 import * as common from '@/common'
 
 type ModalProps = {
@@ -8,13 +8,17 @@ type ModalProps = {
   handler: any
   formContent?: ReactNode
   title: string
+  noOverlay?: boolean
+  chevronDoubleRightIcon?: boolean
 }
 
 export default function Modal({
   open,
   handler,
   formContent,
-  title
+  title,
+  noOverlay = false,
+  chevronDoubleRightIcon = false
 }: ModalProps) {
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -62,11 +66,19 @@ export default function Modal({
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="absolute top-0 left-0 flex pt-4 pr-2 -ml-8 sm:-ml-10 sm:pr-4">
+                  <div
+                    className={`absolute  left-0 flex pt-4 pr-2 -ml-8 sm:-ml-10 sm:pr-4 ${
+                      chevronDoubleRightIcon ? 'top-1/2' : 'top-0'
+                    }`}
+                  >
                     <button
                       data-testid="button"
                       type="button"
-                      className="text-gray-300 rounded-md hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                      className={` ${
+                        chevronDoubleRightIcon
+                          ? 'btn dark:bg-dark-3 hover:outline-none focus:outline-none'
+                          : 'text-gray-300 rounded-md hover:text-white focus:outline-none focus:ring-2 focus:ring-white'
+                      }`}
                       onClick={() =>
                         handler((lastState: any) => {
                           return {
@@ -77,7 +89,11 @@ export default function Modal({
                       }
                     >
                       <span className="sr-only">Fechar painel</span>
-                      <XIcon className="w-6 h-6" aria-hidden="true" />
+                      {chevronDoubleRightIcon ? (
+                        <ChevronDoubleRightIcon className="w-6 h-6" />
+                      ) : (
+                        <XIcon className="w-6 h-6" aria-hidden="true" />
+                      )}
                     </button>
                   </div>
                 </Transition.Child>

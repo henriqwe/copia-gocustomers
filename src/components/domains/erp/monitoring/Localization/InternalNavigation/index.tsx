@@ -1,9 +1,12 @@
-import * as common from '@/common'
 import { Actions } from './actions'
-import { links } from './links'
-
+import { ChevronDoubleLeftIcon } from '@heroicons/react/outline'
 const InternalNavigation = () => {
-  return <common.MainMenu LinkGroup={links} ActionsGroup={Actions()} />
+  const [{ handler }] = Actions()
+  return (
+    <button onClick={() => handler()} className="btn btn-primary">
+      <ChevronDoubleLeftIcon className="w-6 h-6" />
+    </button>
+  )
 }
 
 export default InternalNavigation
