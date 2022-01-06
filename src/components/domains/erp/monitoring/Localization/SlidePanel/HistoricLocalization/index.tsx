@@ -3,9 +3,9 @@ import { useState } from 'react'
 import * as buttons from '@/common/Buttons'
 import * as form from '@/common/Form'
 import * as localizations from '@/domains/erp/monitoring/Localization'
+import * as common from '@/common'
 
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup'
-import { notification } from 'utils/notification'
 import { showError } from 'utils/showError'
 
 type vehicle = {
@@ -34,12 +34,7 @@ type vehicle = {
 }
 
 type FormData = {
-  Id: string
-  Cliente_Id: {
-    key: string
-    title: string
-  }
-  Colaborador_Id: {
+  Veiculos: {
     key: string
     title: string
   }
@@ -67,25 +62,10 @@ export default function CreateLocalization() {
     resolver: yupResolver(localizationSchema)
   })
   const onSubmit = (formData: FormData) => {
-    console.log(formData)
     try {
       if (formData.Veiculos === undefined) {
-        throw new Error('Preencha um campo para continuar')
+        throw new Error('Selectione um veículo')
       }
-      createLocalization({
-        variables: {
-          Cliente_Id: formData.Cliente_Id ? formData.Cliente_Id.key : null,
-          Colaborador_Id: formData.Colaborador_Id
-            ? formData.Colaborador_Id.key
-            : null
-        }
-      }).then(() => {
-        localizationsRefetch()
-        setSlidePanelState((oldState) => {
-          return { ...oldState, open: false }
-        })
-        notification('Usuário cadastrado com sucesso', 'success')
-      })
     } catch (err: any) {
       showError(err)
     }
@@ -109,7 +89,7 @@ export default function CreateLocalization() {
         className="flex flex-col items-end"
       >
         <div className="grid grid-flow-col w-full gap-2 mb-2">
-          <div className="col-span-10">
+          <div className="col-span-11 ">
             <Controller
               control={control}
               name="Veiculos"
@@ -144,7 +124,8 @@ export default function CreateLocalization() {
           </div>
 
           <buttons.SecondaryButton
-            className="col-span-2"
+            className="col-span-1"
+            buttonClassName="w-full justify-center"
             title="Exibir no Mapa"
             handler={() => {
               return
@@ -154,7 +135,7 @@ export default function CreateLocalization() {
           />
         </div>
       </form>
-
+      <common.Separator />
       {vehicleConsultData && (
         <div className="w-full mt-4">
           <h2>Informações</h2>
