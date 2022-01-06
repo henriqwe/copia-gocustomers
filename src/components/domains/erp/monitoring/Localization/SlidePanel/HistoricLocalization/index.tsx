@@ -1,16 +1,37 @@
 import { Controller, useForm } from 'react-hook-form'
-
-import * as common from '@/common'
+import { useState } from 'react'
 import * as buttons from '@/common/Buttons'
 import * as form from '@/common/Form'
 import * as localizations from '@/domains/erp/monitoring/Localization'
-import * as clients from '@/domains/erp/identities/Clients'
 
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup'
 import { notification } from 'utils/notification'
 import { showError } from 'utils/showError'
-import router from 'next/router'
-import rotas from '@/domains/routes'
+
+type vehicle = {
+  crs: string
+  data: string
+  dist: string
+  latitude: string
+  ligado: number
+  longitude: string
+  speed: string
+  carro_id?: number
+  placa?: string
+  chassis?: string
+  renavan?: string
+  ano_modelo?: string
+  cor?: string
+  veiculo?: string
+  carro_fabricante?: string
+  carro_categoria?: string
+  carro_tipo?: string
+  combustivel?: string
+  ano?: string
+  frota?: string
+  imei?: string
+  date_rastreador?: string
+}
 
 type FormData = {
   Id: string
@@ -23,7 +44,12 @@ type FormData = {
     title: string
   }
 }
-
+type vehicleToConsult = {
+  key: any
+  title: string | number
+  length?: number | undefined
+  type: string
+}
 export default function CreateLocalization() {
   const {
     createLocalizationLoading,
@@ -31,11 +57,8 @@ export default function CreateLocalization() {
     setSlidePanelState,
     localizationsRefetch,
     localizationSchema,
-    collaboratorsData,
-    vehicleLocationInfo,
     allUserVehicle
   } = localizations.useLocalization()
-  const { clientsData } = clients.useList()
   const {
     handleSubmit,
     formState: { errors },
@@ -70,44 +93,59 @@ export default function CreateLocalization() {
     }
   }
 
+  const [vehicleConsultData, setVehicleConsultData] = useState<vehicle>()
+
+  function showVehicleInfo(vehicle: vehicleToConsult) {
+    const vehicleData = allUserVehicle?.filter((elem) => {
+      if (elem.carro_id === vehicle.key) return elem
+    })
+
+    if (vehicleData) setVehicleConsultData(vehicleData[0])
+  }
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       data-testid="inserirForm"
       className="flex flex-col items-end"
     >
-      <div className="flex flex-col w-full gap-2 mb-2">
-        <Controller
-          control={control}
-          name="Veiculos"
-          render={({ field: { onChange, value } }) => (
-            <div>
-              <form.Select
-                itens={
-                  allUserVehicle
-                    ? allUserVehicle
-                        .filter((item) => {
-                          if (item.placa != null) return item
-                        })
-                        .map((item) => {
-                          return {
-                            key: item.carro_id,
-                            title: item.placa as string
-                          }
-                        })
-                    : []
-                }
-                value={value}
-                onChange={onChange}
-                error={errors.Cliente_Id}
-                label="Veiculos"
-              />
-            </div>
-          )}
-        />
-      </div>
-      <div className="flex justify-between w-full">
+      <div className="grid grid-flow-col w-full gap-2 mb-2">
+        <div className="col-span-10">
+          <Controller
+            control={control}
+            name="Veiculos"
+            render={({ field: { onChange, value } }) => (
+              <div>
+                <form.Select
+                  itens={
+                    allUserVehicle
+                      ? allUserVehicle
+                          .filter((item) => {
+                            if (item.placa != null) return item
+                          })
+                          .map((item) => {
+                            return {
+                              key: item.carro_id,
+                              title: item.placa as string
+                            }
+                          })
+                      : []
+                  }
+                  value={value}
+                  onChange={(value) => {
+                    onChange(value)
+                    showVehicleInfo(value)
+                  }}
+                  error={errors.Cliente_Id}
+                  label="Veiculos"
+                />
+              </div>
+            )}
+          />
+        </div>
+
         <buttons.SecondaryButton
+          className="col-span-2"
           title="Exibir no Mapa"
           handler={() => {
             return
@@ -115,12 +153,26 @@ export default function CreateLocalization() {
           disabled={createLocalizationLoading}
           loading={createLocalizationLoading}
         />
-        <buttons.PrimaryButton
-          title="Consultar"
-          disabled={createLocalizationLoading}
-          loading={createLocalizationLoading}
-        />
       </div>
+
+      {vehicleConsultData && (
+        <div className="w-full mt-4">
+          <h2>Informações</h2>
+          <p>
+            <b>Última atualização:</b> {vehicleConsultData.date_rastreador}
+          </p>
+          <p>
+            <b>Placa:</b> {vehicleConsultData.placa}
+          </p>
+          <p>
+            <b>Velocidade:</b> {Math.floor(Number(vehicleConsultData.speed))}{' '}
+            Km/H
+          </p>
+          <p>
+            <b>Ignição:</b> {vehicleConsultData.ligado ? 'Ligado' : 'Desligado'}
+          </p>
+        </div>
+      )}
     </form>
   )
 }

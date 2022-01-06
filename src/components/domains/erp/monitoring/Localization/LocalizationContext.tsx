@@ -239,16 +239,21 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     Cliente_Id: yup.object()
   })
 
+  async function updateAllUserVehiclesLocations() {
+    // setInterval(async () => {
+    const responseGetUserVehicles = await getAllUserVehicles(
+      'operacional@radarescolta.com'
+    )
+    setAllUserVehicle(responseGetUserVehicles)
+    // }, 30000)
+  }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     const responseGetVehicleLocationRealTime = await getVehicleLocationRealTime(
       '285513'
     )
     setVehicleLocationInfo(responseGetVehicleLocationRealTime)
-    const responseGetUserVehicles = await getAllUserVehicles(
-      'operacional@radarescolta.com'
-    )
-    setAllUserVehicle(responseGetUserVehicles)
+    updateAllUserVehiclesLocations()
   }, [])
   return (
     <LocalizationContext.Provider
