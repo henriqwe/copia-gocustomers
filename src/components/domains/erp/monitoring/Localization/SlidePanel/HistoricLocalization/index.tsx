@@ -67,11 +67,9 @@ export default function CreateLocalization() {
     resolver: yupResolver(localizationSchema)
   })
   const onSubmit = (formData: FormData) => {
+    console.log(formData)
     try {
-      if (
-        formData.Cliente_Id === undefined &&
-        formData.Colaborador_Id === undefined
-      ) {
+      if (formData.Veiculos === undefined) {
         throw new Error('Preencha um campo para continuar')
       }
       createLocalization({
@@ -104,56 +102,58 @@ export default function CreateLocalization() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      data-testid="inserirForm"
-      className="flex flex-col items-end"
-    >
-      <div className="grid grid-flow-col w-full gap-2 mb-2">
-        <div className="col-span-10">
-          <Controller
-            control={control}
-            name="Veiculos"
-            render={({ field: { onChange, value } }) => (
-              <div>
-                <form.Select
-                  itens={
-                    allUserVehicle
-                      ? allUserVehicle
-                          .filter((item) => {
-                            if (item.placa != null) return item
-                          })
-                          .map((item) => {
-                            return {
-                              key: item.carro_id,
-                              title: item.placa as string
-                            }
-                          })
-                      : []
-                  }
-                  value={value}
-                  onChange={(value) => {
-                    onChange(value)
-                    showVehicleInfo(value)
-                  }}
-                  error={errors.Cliente_Id}
-                  label="Veiculos"
-                />
-              </div>
-            )}
+    <>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        data-testid="inserirForm"
+        className="flex flex-col items-end"
+      >
+        <div className="grid grid-flow-col w-full gap-2 mb-2">
+          <div className="col-span-10">
+            <Controller
+              control={control}
+              name="Veiculos"
+              render={({ field: { onChange, value } }) => (
+                <div>
+                  <form.Select
+                    itens={
+                      allUserVehicle
+                        ? allUserVehicle
+                            .filter((item) => {
+                              if (item.placa != null) return item
+                            })
+                            .map((item) => {
+                              return {
+                                key: item.carro_id,
+                                title: item.placa as string
+                              }
+                            })
+                        : []
+                    }
+                    value={value}
+                    onChange={(value) => {
+                      onChange(value)
+                      showVehicleInfo(value)
+                    }}
+                    error={errors.Cliente_Id}
+                    label="Veiculos"
+                  />
+                </div>
+              )}
+            />
+          </div>
+
+          <buttons.SecondaryButton
+            className="col-span-2"
+            title="Exibir no Mapa"
+            handler={() => {
+              return
+            }}
+            disabled={createLocalizationLoading}
+            loading={createLocalizationLoading}
           />
         </div>
-
-        <buttons.SecondaryButton
-          className="col-span-2"
-          title="Exibir no Mapa"
-          handler={() => {
-            return
-          }}
-          disabled={createLocalizationLoading}
-          loading={createLocalizationLoading}
-        />
-      </div>
+      </form>
 
       {vehicleConsultData && (
         <div className="w-full mt-4">
@@ -173,6 +173,6 @@ export default function CreateLocalization() {
           </p>
         </div>
       )}
-    </form>
+    </>
   )
 }

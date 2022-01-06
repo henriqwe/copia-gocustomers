@@ -1,23 +1,32 @@
 import axios from 'axios'
+import { showError } from 'utils/showError'
 
 export async function getVehicleLocationRealTime(carro_id: string) {
-  const { data } = await axios.post(
-    'https://integration.chaser.com.br/mobile/api/veiculo/localizacao/temporeal',
-    {
-      carro_id
-    }
-  )
-  return data
+  try {
+    const { data } = await axios.post(
+      'https://integration.chaser.com.br/mobile/api/veiculo/localizacao/temporeal',
+      {
+        carro_id
+      }
+    )
+    return data
+  } catch (err: any) {
+    showError(err)
+  }
 }
 
 export async function getAllUserVehicles(email: string) {
-  const { data } = await axios.post(
-    'https://integration.chaser.com.br/mobile/api/veiculo/usuario',
-    {
-      email
-    }
-  )
-  return data
+  try {
+    const { data } = await axios.post(
+      'https://integration.chaser.com.br/mobile/api/veiculo/usuario',
+      {
+        email
+      }
+    )
+    return data
+  } catch (err: any) {
+    showError(err)
+  }
 }
 
 export async function getVehicleHistoric(
@@ -25,13 +34,17 @@ export async function getVehicleHistoric(
   inicio: string,
   fim: string
 ) {
-  const { data } = await axios.post(
-    'https://integration.chaser.com.br/mobile/api/veiculo/usuario',
-    {
-      carro_id,
-      inicio,
-      fim
-    }
-  )
-  return data
+  try {
+    const { data } = await axios.post(
+      'https://integration.chaser.com.br/mobile/api/veiculo/usuario',
+      {
+        carro_id,
+        inicio,
+        fim
+      }
+    )
+    return data
+  } catch (err: any) {
+    showError(err)
+  }
 }
