@@ -71,6 +71,7 @@ export function Page() {
   let marker: google.maps.Marker
   let timer: timerProps
   const [mapa, setMapa] = useState<google.maps.Map>()
+
   function initMap() {
     const loader = new Loader({
       apiKey: 'AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I',
@@ -104,14 +105,6 @@ export function Page() {
           }
         )
         mapGoogle.setOptions({ styles })
-
-        allUserVehicle
-          ?.filter((vehicle) => {
-            if (vehicle.latitude && vehicle.longitude) return vehicle
-          })
-          .map((vehicle) => {
-            createNewVehicleMarker(mapGoogle, google, vehicle)
-          })
         setMapa(mapGoogle)
       })
       .catch((e) => {
@@ -186,26 +179,7 @@ export function Page() {
 
     flightPath.setMap(map)
   }
-  function moveMarker(
-    marker: google.maps.Marker,
-    departure: google.maps.LatLng,
-    currentMarkerPos: google.maps.LatLng
-  ) {
-    marker.setPosition(currentMarkerPos)
 
-    if (
-      departure.lat() !== currentMarkerPos.lat() &&
-      departure.lng() !== currentMarkerPos.lng()
-    ) {
-      const heading = google.maps.geometry.spherical.computeHeading(
-        departure,
-        currentMarkerPos
-      )
-      const icon = marker.get('icon')
-      icon.rotation = heading
-      marker.setIcon(icon)
-    }
-  }
   function addPathCoords() {
     if (addicionalPathCoords[0][0].lat !== undefined) {
       pathCoords.push(...addicionalPathCoords.shift())
@@ -216,6 +190,16 @@ export function Page() {
 
   useEffect(() => {
     initMap()
+  }, [])
+
+  useEffect(() => {
+    allUserVehicle
+      ?.filter((vehicle) => {
+        if (vehicle.latitude && vehicle.longitude) return vehicle
+      })
+      .map((vehicle) => {
+        createNewVehicleMarker(mapa, vehicle)
+      })
   }, [allUserVehicle])
 
   useEffect(() => {
@@ -242,8 +226,7 @@ export function Page() {
 }
 
 function createNewVehicleMarker(
-  map: google.maps.Map,
-  google: any,
+  map: google.maps.Map | undefined,
   vehicle: vehicle
 ) {
   const marker = new google.maps.Marker({
@@ -298,5 +281,26 @@ function centerMapInVehicle(
   if (map && coords) {
     map.setCenter(coords)
     map.setZoom(19)
+  }
+}
+
+function moveMarker(
+  markers: google.maps.Marker,
+  departure: google.maps.LatLng,
+  currentMarkerPos: google.maps.LatLng
+) {
+  markers.setPosition(currentMarkerPos)
+
+  if (
+    departure.lat() !== currentMarkerPos.lat() &&
+    departure.lng() !== currentMarkerPos.lng()
+  ) {
+    const heading = google.maps.geometry.spherical.computeHeading(
+      departure,
+      currentMarkerPos
+    )
+    const icon = markers.get('icon')
+    icon.rotation = heading
+    markers.setIcon(icon)
   }
 }

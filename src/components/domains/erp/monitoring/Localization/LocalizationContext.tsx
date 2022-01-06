@@ -258,12 +258,18 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
   }
 
   async function updateAllUserVehiclesLocations() {
-    // setInterval(async () => {
-    const responseGetUserVehicles = await getAllUserVehicles(
+    let responseGetUserVehicles = await getAllUserVehicles(
       'operacional@radarescolta.com'
     )
     setAllUserVehicle(responseGetUserVehicles)
-    // }, 30000)
+    console.log('rodou 1')
+    setInterval(async () => {
+      console.log('rodou')
+      responseGetUserVehicles = await getAllUserVehicles(
+        'operacional@radarescolta.com'
+      )
+      setAllUserVehicle(responseGetUserVehicles)
+    }, 30000)
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
