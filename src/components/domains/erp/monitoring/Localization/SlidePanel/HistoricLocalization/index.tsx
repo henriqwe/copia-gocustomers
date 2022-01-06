@@ -7,6 +7,7 @@ import * as common from '@/common'
 
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup'
 import { showError } from 'utils/showError'
+import { getStreetNameByLatLng } from '../../../api'
 
 type vehicle = {
   crs: string
@@ -68,6 +69,7 @@ export default function CreateLocalization() {
   }
 
   const [vehicleConsultData, setVehicleConsultData] = useState<vehicle>()
+  const [dadosEnd, setDadosEnd] = useState('')
 
   function showVehicleInfo(vehicle: vehicleToConsult) {
     const vehicleData = allUserVehicle?.filter((elem) => {
@@ -75,6 +77,15 @@ export default function CreateLocalization() {
     })
 
     if (vehicleData) setVehicleConsultData(vehicleData[0])
+  }
+
+  async function getStreetName(vehicleConsultData: vehicle) {
+    const response = await getStreetNameByLatLng(
+      vehicleConsultData.latitude,
+      vehicleConsultData.longitude
+    )
+    console.log(response)
+    // setDadosEnd(response)
   }
 
   return (
@@ -110,6 +121,7 @@ export default function CreateLocalization() {
                     onChange={(value) => {
                       onChange(value)
                       showVehicleInfo(value)
+                      setDadosEnd('')
                     }}
                     error={errors.Cliente_Id}
                     label="Veiculos"
@@ -134,7 +146,19 @@ export default function CreateLocalization() {
         <div className="w-full mt-4">
           <h2>Informações</h2>
           <p>
-            <b>Última atualização:</b> {vehicleConsultData.date_rastreador}
+            <b>Última atualização:</b>{' '}
+            {new Date(vehicleConsultData.date_rastreador).toLocaleDateString(
+              'pt-br',
+              {
+                dateStyle: 'short'
+              }
+            )}{' '}
+            {new Date(vehicleConsultData.date_rastreador).toLocaleTimeString(
+              'pt-br',
+              {
+                timeStyle: 'medium'
+              }
+            )}
           </p>
           <p>
             <b>Placa:</b> {vehicleConsultData.placa}
@@ -145,6 +169,20 @@ export default function CreateLocalization() {
           </p>
           <p>
             <b>Ignição:</b> {vehicleConsultData.ligado ? 'Ligado' : 'Desligado'}
+          </p>
+          <p>
+            <b>Endereço:</b>{' '}
+            {dadosEnd ? (
+              <span>{dadosEnd}</span>
+            ) : (
+              <button
+                onClick={() => {
+                  getStreetName(vehicleConsultData)
+                }}
+              >
+                Click aqui para consultar
+              </button>
+            )}
           </p>
         </div>
       )}

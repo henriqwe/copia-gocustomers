@@ -171,7 +171,6 @@ function createNewVehicleMarker(
   })
   const infowindow = new google.maps.InfoWindow({
     content: `<div class='text-dark-7'>
-    <p><b>Última atualização:</b> ${vehicle.date_rastreador}</p>
     <p><b>Placa:</b> ${vehicle.placa}</p>
     <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} Km/H</p>
     <p><b>Ignição:</b> ${vehicle.ligado ? 'Ligado' : 'Desligado'}</p>
@@ -228,7 +227,6 @@ function updateVehicleMarker(
 
   const infowindow = new google.maps.InfoWindow({
     content: `<div class='text-dark-7'>
-    <p><b>Última atualização:</b> ${vehicle.date_rastreador}</p>
     <p><b>Placa:</b> ${vehicle.placa}</p>
     <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} Km/H</p>
     <p><b>Ignição:</b> ${vehicle.ligado ? 'Ligado' : 'Desligado'}</p>

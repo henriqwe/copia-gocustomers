@@ -48,3 +48,20 @@ export async function getVehicleHistoric(
     showError(err)
   }
 }
+export async function getStreetNameByLatLng(
+  lat: number | string,
+  lng: number | string
+) {
+  try {
+    const { data } = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I`
+    )
+    if (data.status === 'REQUEST_DENIED') {
+      showError(data)
+      return
+    }
+    return data
+  } catch (err: any) {
+    showError(err)
+  }
+}
