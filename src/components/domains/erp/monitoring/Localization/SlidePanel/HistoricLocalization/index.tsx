@@ -52,7 +52,8 @@ export default function CreateLocalization() {
     setSlidePanelState,
     localizationsRefetch,
     localizationSchema,
-    allUserVehicle
+    allUserVehicle,
+    centerVehicleInMap
   } = localizations.useLocalization()
   const {
     handleSubmit,
@@ -66,6 +67,8 @@ export default function CreateLocalization() {
       if (formData.Veiculos === undefined) {
         throw new Error('Selectione um veículo')
       }
+
+      centerVehicleInMap(Number(formData.Veiculos.key))
     } catch (err: any) {
       showError(err)
     }

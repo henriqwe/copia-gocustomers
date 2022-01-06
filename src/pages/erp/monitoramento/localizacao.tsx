@@ -2,7 +2,7 @@ import rotas from '@/domains/routes'
 import * as localizations from '@/domains/erp/monitoring/Localization'
 
 import { Loader } from '@googlemaps/js-api-loader'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import MapTemplate from '@/templates/MapTemplate'
 
 type vehicle = {
@@ -59,15 +59,18 @@ export default function Localizacao() {
 }
 
 export function Page() {
-  const { localizationsRefetch, localizationsLoading, allUserVehicle } =
-    localizations.useLocalization()
+  const {
+    localizationsRefetch,
+    localizationsLoading,
+    allUserVehicle,
+    coordsToCenterMap
+  } = localizations.useLocalization()
 
   let google: any
   let line: google.maps.Polyline
   let marker: google.maps.Marker
   let timer: timerProps
-  let map: google.maps.Map
-
+  const [mapa, setMapa] = useState<google.maps.Map>()
   function initMap() {
     const loader = new Loader({
       apiKey: 'AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I',
@@ -89,7 +92,7 @@ export function Page() {
       .load()
       .then((response) => {
         google = response
-        map = new google.maps.Map(
+        const mapGoogle = new google.maps.Map(
           document.getElementById('googleMaps') as HTMLElement,
           {
             center: {
@@ -100,15 +103,16 @@ export function Page() {
             mapTypeId: google.maps.MapTypeId.ROADMAP
           }
         )
-        map.setOptions({ styles })
+        mapGoogle.setOptions({ styles })
 
         allUserVehicle
           ?.filter((vehicle) => {
             if (vehicle.latitude && vehicle.longitude) return vehicle
           })
           .map((vehicle) => {
-            createNewVehicleMarker(map, google, vehicle)
+            createNewVehicleMarker(mapGoogle, google, vehicle)
           })
+        setMapa(mapGoogle)
       })
       .catch((e) => {
         console.log('error: ', e)
@@ -209,41 +213,14 @@ export function Page() {
     }
     addicionalPathCoords.shift()
   }
-  function createMarkerWhitInfo(position: locationProps) {
-    const infowindow = new google.maps.InfoWindow({
-      content: `<div class='text-dark-7'>
-      <p><b>Velocidade:</b> ${position.velocity}Km/H</p>
-      <p><b>Motor:</b> ${position.engineRunning ? 'Ligado' : 'Desligado'}</p>
-      </div> `
-    })
-    const markerlocal = new google.maps.Marker({
-      position,
-      map,
-      zIndex: 1,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 5,
-        strokeWeight: 0,
-        fillColor: '#000',
-        fillOpacity: 1
-      }
-    })
-    markerlocal.addListener('mouseover', () => {
-      infowindow.open({
-        anchor: markerlocal,
-        map,
-        shouldFocus: false
-      })
-    })
-    markerlocal.addListener('mouseout', () => {
-      infowindow.close()
-    })
-  }
 
   useEffect(() => {
     initMap()
   }, [allUserVehicle])
 
+  useEffect(() => {
+    centerMapInVehicle(coordsToCenterMap, mapa)
+  }, [coordsToCenterMap])
   return (
     <MapTemplate
       reload={{ action: localizationsRefetch, state: localizationsLoading }}
@@ -312,4 +289,14 @@ function setVehicleColor(vehicle: vehicle) {
   }
 
   return '#818181'
+}
+
+function centerMapInVehicle(
+  coords: { lat: number; lng: number } | undefined,
+  map: google.maps.Map | undefined
+) {
+  if (map && coords) {
+    map.setCenter(coords)
+    map.setZoom(19)
+  }
 }

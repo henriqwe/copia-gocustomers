@@ -48,6 +48,7 @@ type vehicle = {
   date_rastreador?: string
 }
 type LocalizationContextProps = {
+  coordsToCenterMap?: { lat: number; lng: number }
   vehicleLocationInfo?: vehicle
   allUserVehicle?: vehicle[]
   slidePanelState: SlidePanelStateType
@@ -117,6 +118,7 @@ type LocalizationContextProps = {
   ) => Promise<FetchResult['data']>
 
   localizationSchema: any
+  centerVehicleInMap?: (carroId: number) => void
 }
 
 type ProviderProps = {
@@ -139,7 +141,11 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     open: false
   })
   const [vehicleLocationInfo, setVehicleLocationInfo] = useState()
-  const [allUserVehicle, setAllUserVehicle] = useState()
+  const [allUserVehicle, setAllUserVehicle] = useState<vehicle[]>([])
+  const [coordsToCenterMap, setCoordsToCenterMap] = useState({
+    lat: -12.100100128939063,
+    lng: -49.24919742233473
+  })
 
   const [createLocalization, { loading: createLocalizationLoading }] =
     useTypedMutation({
@@ -238,6 +244,18 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     Colaborador_Id: yup.object(),
     Cliente_Id: yup.object()
   })
+  function centerVehicleInMap(carroId: number) {
+    const vehicle = allUserVehicle?.filter((elem: vehicle) => {
+      if (elem.carro_id === carroId) return elem
+    })
+
+    if (vehicle) {
+      setCoordsToCenterMap({
+        lat: Number(vehicle[0].latitude),
+        lng: Number(vehicle[0].longitude)
+      })
+    }
+  }
 
   async function updateAllUserVehiclesLocations() {
     // setInterval(async () => {
@@ -247,6 +265,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     setAllUserVehicle(responseGetUserVehicles)
     // }, 30000)
   }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     const responseGetVehicleLocationRealTime = await getVehicleLocationRealTime(
@@ -255,6 +274,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     setVehicleLocationInfo(responseGetVehicleLocationRealTime)
     updateAllUserVehiclesLocations()
   }, [])
+
   return (
     <LocalizationContext.Provider
       value={{
@@ -275,7 +295,9 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
         vehicleLocationInfo,
         setVehicleLocationInfo,
         allUserVehicle,
-        setAllUserVehicle
+        setAllUserVehicle,
+        centerVehicleInMap,
+        coordsToCenterMap
       }}
     >
       {children}
