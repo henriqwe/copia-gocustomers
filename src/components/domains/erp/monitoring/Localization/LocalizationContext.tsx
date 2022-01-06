@@ -1,17 +1,4 @@
 import {
-  ApolloCache,
-  DefaultContext,
-  FetchResult,
-  MutationFunctionOptions,
-  OperationVariables
-} from '@apollo/client'
-import { GraphQLTypes } from 'graphql/generated/zeus'
-import {
-  $,
-  useTypedMutation,
-  useTypedQuery
-} from 'graphql/generated/zeus/apollo'
-import {
   createContext,
   Dispatch,
   ReactNode,
@@ -53,70 +40,12 @@ type LocalizationContextProps = {
   allUserVehicle?: vehicle[]
   slidePanelState: SlidePanelStateType
   setSlidePanelState: Dispatch<SetStateAction<SlidePanelStateType>>
-  collaboratorsData?: {
-    Id: string
-    Pessoa: {
-      Nome: string
-    }
-  }[]
-  localizationsData?: {
-    Id: string
-    Cliente?: {
-      Id: string
-      Pessoa: {
-        Nome: string
-      }
-    }
-    Colaborador?: {
-      Id: string
-      Pessoa: {
-        Nome: string
-      }
-    }
-  }[]
   collaboratorsRefetch: () => void
   localizationsLoading: boolean
   localizationsRefetch: () => void
-  createLocalization: (
-    options?: MutationFunctionOptions<
-      {
-        insert_autenticacao_Usuarios_one?: {
-          Id: string
-        }
-      },
-      OperationVariables,
-      DefaultContext,
-      ApolloCache<unknown>
-    >
-  ) => Promise<FetchResult['data']>
   createLocalizationLoading: boolean
   softDeleteLocalizationLoading: boolean
-  softDeleteLocalization: (
-    options?: MutationFunctionOptions<
-      {
-        update_autenticacao_Usuarios_by_pk?: {
-          Id: string
-        }
-      },
-      OperationVariables,
-      DefaultContext,
-      ApolloCache<unknown>
-    >
-  ) => Promise<FetchResult['data']>
   updateLocalizationLoading: boolean
-  updateLocalization: (
-    options?: MutationFunctionOptions<
-      {
-        update_autenticacao_Usuarios_by_pk?: {
-          Id: string
-        }
-      },
-      OperationVariables,
-      DefaultContext,
-      ApolloCache<unknown>
-    >
-  ) => Promise<FetchResult['data']>
-
   localizationSchema: any
   centerVehicleInMap?: (carroId: number) => void
 }
@@ -127,7 +56,7 @@ type ProviderProps = {
 
 type SlidePanelStateType = {
   type: 'create' | 'update'
-  data?: GraphQLTypes['autenticacao_Usuarios'] | null
+  data?: null
   open: boolean
 }
 
@@ -146,99 +75,6 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     lat: -12.100100128939063,
     lng: -49.24919742233473
   })
-
-  const [createLocalization, { loading: createLocalizationLoading }] =
-    useTypedMutation({
-      insert_autenticacao_Usuarios_one: [
-        {
-          object: {
-            Cliente_Id: $`Cliente_Id`,
-            Colaborador_Id: $`Colaborador_Id`
-          }
-        },
-        { Id: true }
-      ]
-    })
-
-  const [updateLocalization, { loading: updateLocalizationLoading }] =
-    useTypedMutation({
-      update_autenticacao_Usuarios_by_pk: [
-        {
-          pk_columns: { Id: $`Id` },
-          _set: {
-            Cliente_Id: $`Cliente_Id`,
-            Colaborador_Id: $`Colaborador_Id`,
-            updated_at: new Date()
-          }
-        },
-        { Id: true }
-      ]
-    })
-
-  const [softDeleteLocalization, { loading: softDeleteLocalizationLoading }] =
-    useTypedMutation({
-      update_autenticacao_Usuarios_by_pk: [
-        {
-          pk_columns: { Id: $`Id` },
-          _set: {
-            deleted_at: new Date()
-          }
-        },
-        {
-          Id: true
-        }
-      ]
-    })
-
-  const {
-    data: localizationsData,
-    refetch: localizationsRefetch,
-    loading: localizationsLoading
-  } = useTypedQuery(
-    {
-      autenticacao_Usuarios: [
-        {
-          order_by: [{ created_at: 'desc' }],
-          where: { deleted_at: { _is_null: true } }
-        },
-        {
-          Id: true,
-          Cliente: {
-            Id: true,
-            Pessoa: {
-              Nome: true
-            }
-          },
-          Colaborador: {
-            Id: true,
-            Pessoa: {
-              Nome: true
-            }
-          }
-        }
-      ]
-    },
-    { fetchPolicy: 'no-cache', notifyOnNetworkStatusChange: true }
-  )
-
-  const { data: collaboratorsData, refetch: collaboratorsRefetch } =
-    useTypedQuery(
-      {
-        identidades_Colaboradores: [
-          {
-            order_by: [{ created_at: 'desc' }],
-            where: { deleted_at: { _is_null: true } }
-          },
-          {
-            Id: true,
-            Pessoa: {
-              Nome: true
-            }
-          }
-        ]
-      },
-      { fetchPolicy: 'no-cache', notifyOnNetworkStatusChange: true }
-    )
 
   const localizationSchema = yup.object().shape({
     Colaborador_Id: yup.object(),
@@ -262,9 +98,8 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
       'operacional@radarescolta.com'
     )
     setAllUserVehicle(responseGetUserVehicles)
-    console.log('rodou 1')
+
     setInterval(async () => {
-      console.log('rodou')
       responseGetUserVehicles = await getAllUserVehicles(
         'operacional@radarescolta.com'
       )
@@ -273,11 +108,11 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const responseGetVehicleLocationRealTime = await getVehicleLocationRealTime(
-      '285513'
-    )
-    setVehicleLocationInfo(responseGetVehicleLocationRealTime)
+  useEffect(() => {
+    // const responseGetVehicleLocationRealTime = await getVehicleLocationRealTime(
+    //   '285513'
+    // )
+    // setVehicleLocationInfo(responseGetVehicleLocationRealTime)
     updateAllUserVehiclesLocations()
   }, [])
 
@@ -286,17 +121,6 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
       value={{
         slidePanelState,
         setSlidePanelState,
-        collaboratorsData: collaboratorsData?.identidades_Colaboradores,
-        collaboratorsRefetch,
-        localizationsData: localizationsData?.autenticacao_Usuarios,
-        localizationsRefetch,
-        localizationsLoading,
-        createLocalization,
-        createLocalizationLoading,
-        softDeleteLocalizationLoading,
-        softDeleteLocalization,
-        updateLocalizationLoading,
-        updateLocalization,
         localizationSchema,
         vehicleLocationInfo,
         setVehicleLocationInfo,

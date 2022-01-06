@@ -29,27 +29,7 @@ type vehicle = {
   imei?: string
   date_rastreador?: string
 }
-type locationProps = {
-  lat: number | undefined
-  lng: number | undefined
-  velocity: number | undefined
-  engineRunning: boolean | undefined
-}
-type locationArrayProps = {
-  location: locationProps
-}[]
-type currentRouteProps = {
-  location: locationProps
-  marker?: boolean
-  stopover?: boolean
-  rotation?: number
-}[]
-type timerProps = {
-  cancel?: (() => void) | undefined
-  pause?: (() => void | undefined) | undefined
-  resume?: (() => void | undefined) | undefined
-  timeoutCallback?: (() => void) | undefined
-}
+
 export default function Localizacao() {
   return (
     <localizations.LocalizationProvider>
@@ -67,9 +47,6 @@ export function Page() {
   } = localizations.useLocalization()
 
   let google: any
-  let line: google.maps.Polyline
-  let marker: google.maps.Marker
-  let timer: timerProps
   const allMarkerVehiclesStep: google.maps.Marker[] = []
   const [allMarkerVehicles, setAllMarkerVehicles] = useState<
     google.maps.Marker[]
@@ -115,82 +92,6 @@ export function Page() {
         console.log('error: ', e)
       })
   }
-  function recursiveAnimate() {
-    timer && timer.cancel ? timer.cancel() : null
-    const icon = marker.getIcon()
-    icon.fillColor = '#009933'
-    marker.setIcon(icon)
-    if (currentPos > pathCoords.length - 5) {
-      icon.fillColor = '#ff0000'
-      marker.setIcon(icon)
-      timer && timer.pause ? timer.pause() : null
-      noConection = true
-      return
-    }
-
-    const departure = new google.maps.LatLng(
-      pathCoords[currentPos].lat,
-      pathCoords[currentPos].lng
-    )
-    const arrival = new google.maps.LatLng(
-      pathCoords[currentPos + 1].lat,
-      pathCoords[currentPos + 1].lng
-    )
-    if (
-      departure.lat() === arrival.lat() &&
-      departure.lng() === arrival.lng()
-    ) {
-      icon.fillColor = '#00d9ff'
-      marker.setIcon(icon)
-    }
-    let step = 0
-    const numSteps = 40 //Change this to set animation resolution
-    const timePerStep = 250 //Change this to alter animation speed
-    timer = InvervalTimer(function () {
-      step += 1
-      if (step > numSteps) {
-        step = 0
-        if (currentPos < pathCoords.length - 4) {
-          createMarkerWhitInfo(pathCoords[currentPos + 1])
-          currentPos++
-          recursiveAnimate()
-          return
-        }
-      } else {
-        const are_we_there_yet = google.maps.geometry.spherical.interpolate(
-          departure,
-          arrival,
-          step / numSteps
-        )
-        line.getPath().push(are_we_there_yet)
-        moveMarker(marker, departure, are_we_there_yet)
-        return
-      }
-    }, timePerStep)
-  }
-  function renderPolylineToInitialPos(index: number) {
-    const paths = pathCoords.slice(0, index + 1)
-    paths.forEach((path) => {
-      createMarkerWhitInfo(path)
-    })
-    const flightPath = new google.maps.Polyline({
-      path: paths,
-      strokeColor: '#4da9d8',
-      strokeOpacity: 1.0,
-      strokeWeight: 4,
-      geodesic: true
-    })
-
-    flightPath.setMap(map)
-  }
-
-  function addPathCoords() {
-    if (addicionalPathCoords[0][0].lat !== undefined) {
-      pathCoords.push(...addicionalPathCoords.shift())
-      return
-    }
-    addicionalPathCoords.shift()
-  }
 
   useEffect(() => {
     initMap()
@@ -206,19 +107,28 @@ export function Page() {
           if (elem.id === vehicle.carro_id) return elem
         })
         if (marker) {
-          updateVehicleMarker(marker, vehicle, mapa)
+          updateVehicleMarker(marker, vehicle, mapa!)
           return
         }
-        if (vehicle.carro_id) {
-          createNewVehicleMarker(mapa, vehicle, allMarkerVehiclesStep)
+
+        createNewVehicleMarker(mapa, vehicle, allMarkerVehiclesStep)
+      })
+    const markersToAdd = allMarkerVehiclesStep.filter((markerStep) => {
+      const validationMarker = allMarkerVehicles.find((elem) => {
+        if (elem.id === markerStep.id) {
+          return elem
         }
       })
-    setAllMarkerVehicles([...allMarkerVehicles, ...allMarkerVehiclesStep])
+      if (validationMarker) return
+      return markerStep
+    })
+    setAllMarkerVehicles([...allMarkerVehicles, ...markersToAdd])
   }, [allUserVehicle])
 
   useEffect(() => {
     centerMapInVehicle(coordsToCenterMap, mapa)
   }, [coordsToCenterMap])
+
   return (
     <MapTemplate
       reload={{ action: localizationsRefetch, state: localizationsLoading }}
@@ -297,27 +207,6 @@ function centerMapInVehicle(
   if (map && coords) {
     map.setCenter(coords)
     map.setZoom(19)
-  }
-}
-
-function moveMarker(
-  markers: google.maps.Marker,
-  departure: google.maps.LatLng,
-  currentMarkerPos: google.maps.LatLng
-) {
-  markers.setPosition(currentMarkerPos)
-
-  if (
-    departure.lat() !== currentMarkerPos.lat() &&
-    departure.lng() !== currentMarkerPos.lng()
-  ) {
-    const heading = google.maps.geometry.spherical.computeHeading(
-      departure,
-      currentMarkerPos
-    )
-    const icon = markers.get('icon')
-    icon.rotation = heading
-    markers.setIcon(icon)
   }
 }
 

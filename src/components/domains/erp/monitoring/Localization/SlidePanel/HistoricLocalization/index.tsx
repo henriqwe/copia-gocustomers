@@ -46,15 +46,8 @@ type vehicleToConsult = {
   type: string
 }
 export default function CreateLocalization() {
-  const {
-    createLocalizationLoading,
-    createLocalization,
-    setSlidePanelState,
-    localizationsRefetch,
-    localizationSchema,
-    allUserVehicle,
-    centerVehicleInMap
-  } = localizations.useLocalization()
+  const { localizationSchema, allUserVehicle, centerVehicleInMap } =
+    localizations.useLocalization()
   const {
     handleSubmit,
     formState: { errors },
@@ -133,8 +126,6 @@ export default function CreateLocalization() {
             handler={() => {
               return
             }}
-            disabled={createLocalizationLoading}
-            loading={createLocalizationLoading}
           />
         </div>
       </form>
