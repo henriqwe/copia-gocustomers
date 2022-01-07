@@ -34,6 +34,7 @@ type vehicle = {
   imei?: string
   date_rastreador?: string
 }
+
 type coordsToCenterMap = {
   lat?: number
   lng?: number
@@ -79,6 +80,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
   const [coordsToCenterMap, setCoordsToCenterMap] = useState<coordsToCenterMap>(
     {}
   )
+  const [localizationsLoading, setLocalizationsLoading] = useState(false)
 
   const localizationSchema = yup.object().shape({
     Colaborador_Id: yup.object(),
@@ -97,12 +99,16 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
       })
     }
   }
-
+  async function localizationsRefetch() {
+    await updateAllUserVehiclesLocations()
+  }
   async function updateAllUserVehiclesLocations() {
+    setLocalizationsLoading(true)
     const responseGetUserVehicles = await getAllUserVehicles(
       'operacional@radarescolta.com'
     )
     if (responseGetUserVehicles) setAllUserVehicle(responseGetUserVehicles)
+    setLocalizationsLoading(false)
   }
 
   useEffect(() => {
@@ -115,6 +121,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
   return (
     <LocalizationContext.Provider
       value={{
+        localizationsRefetch,
         slidePanelState,
         setSlidePanelState,
         localizationSchema,
@@ -123,7 +130,8 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
         allUserVehicle,
         setAllUserVehicle,
         centerVehicleInMap,
-        coordsToCenterMap
+        coordsToCenterMap,
+        localizationsLoading
       }}
     >
       {children}

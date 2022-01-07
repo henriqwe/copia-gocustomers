@@ -144,7 +144,7 @@ export default function CreateLocalization() {
       <common.Separator />
       {vehicleConsultData && (
         <div className="w-full mt-4">
-          <h2>Informações</h2>
+          <p className="font-black text-lg">Informações sobre o veículo</p>
           <p>
             <b>Última atualização:</b>{' '}
             {new Date(vehicleConsultData.date_rastreador).toLocaleDateString(
