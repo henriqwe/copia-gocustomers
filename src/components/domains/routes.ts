@@ -4,7 +4,8 @@ export default {
     monitoramento: {
       localizacao: '/erp/monitoramento/localizacao',
       trajetos: '/erp/monitoramento/trajetos',
-      comandos: '/erp/monitoramento/comandos'
+      comandos: '/erp/monitoramento/comandos',
+      index: '/erp/monitoramento'
     },
     index: '/erp'
   },
