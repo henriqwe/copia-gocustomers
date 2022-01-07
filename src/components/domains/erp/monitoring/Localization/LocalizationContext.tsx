@@ -8,7 +8,7 @@ import {
   useState
 } from 'react'
 import * as yup from 'yup'
-import { getAllUserVehicles, getVehicleLocationRealTime } from '../api'
+import { getAllUserVehicles } from '../api'
 
 type vehicle = {
   crs: string
@@ -105,12 +105,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     if (responseGetUserVehicles) setAllUserVehicle(responseGetUserVehicles)
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    // const responseGetVehicleLocationRealTime = await getVehicleLocationRealTime(
-    //   '285513'
-    // )
-    // setVehicleLocationInfo(responseGetVehicleLocationRealTime)
     updateAllUserVehiclesLocations()
     setInterval(async () => {
       updateAllUserVehiclesLocations()

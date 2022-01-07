@@ -138,8 +138,10 @@ export function Page() {
         { title: 'Localização', url: rotas.erp.monitoramento.localizacao }
       ]}
     >
-      <div className="absolute z-50 top-1/2 right-0">
-        <localizations.InternalNavigation />
+      <div className="absolute z-50 h-5/6 right-0 flex items-center">
+        <div className="h-20 w-8">
+          <localizations.InternalNavigation />
+        </div>
       </div>
       <localizations.SlidePanel />
       <div className="h-full w-full">
@@ -172,7 +174,7 @@ function createNewVehicleMarker(
   const infowindow = new google.maps.InfoWindow({
     content: `<div class='text-dark-7'>
     <p><b>Placa:</b> ${vehicle.placa}</p>
-    <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} Km/H</p>
+    <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} km/h</p>
     <p><b>Ignição:</b> ${vehicle.ligado ? 'Ligado' : 'Desligado'}</p>
     </div> `
   })
@@ -248,7 +250,7 @@ function updateVehicleMarker(
   const infowindow = new google.maps.InfoWindow({
     content: `<div class='text-dark-7'>
     <p><b>Placa:</b> ${vehicle.placa}</p>
-    <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} Km/H</p>
+    <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} km/h</p>
     <p><b>Ignição:</b> ${vehicle.ligado ? 'Ligado' : 'Desligado'}</p>
     </div> `
   })

@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from 'react'
+import { ReactNode, useState } from 'react'
 
 import * as common from '@/common'
 
@@ -6,7 +6,7 @@ import ChangeCompany from '@/domains/_compartilhado/ChangeCompany'
 import MainNavigation from '@/domains/_compartilhado/MainNavigation'
 import Logout from '@/domains/_compartilhado/Logout'
 
-type MapTemplateProps = {
+type BaseTemplateProps = {
   children: ReactNode
   title?: string
   reload?: {
@@ -16,26 +16,21 @@ type MapTemplateProps = {
   currentLocation?: { title: string; url: string }[]
 }
 
-export default function MapTemplate({
+export default function BaseTemplate({
   children,
   title = 'Dashboard',
   reload = { action: () => null, state: false },
   currentLocation = []
-}: MapTemplateProps) {
+}: BaseTemplateProps) {
   const [disabled, setDisabled] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [open, setOpen] = useState(false)
   const [empresa, setEmpresa] = useState('Comigo Rastreamento')
-
-  useEffect(() => {
-    document.querySelector('body')?.classList.add('pr-0', 'pb-0')
-  })
-
   return (
     <div className="flex">
       <MainNavigation />
-      <div className="content pr-0">
-        <div className="z-10 top-bar pr-4">
+      <div className="content">
+        <div className="z-10 top-bar">
           <common.Breadcrumb
             title={title}
             reload={reload}
@@ -44,7 +39,7 @@ export default function MapTemplate({
             setShowModal={setShowModal}
           />
         </div>
-        <div className="w-full h-full">{children}</div>
+        <div className="h-5/6">{children}</div>
       </div>
       <ChangeCompany
         empresa={empresa}

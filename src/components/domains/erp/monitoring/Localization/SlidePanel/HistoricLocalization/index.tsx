@@ -84,8 +84,8 @@ export default function CreateLocalization() {
       vehicleConsultData.latitude,
       vehicleConsultData.longitude
     )
-    console.log(response)
-    // setDadosEnd(response)
+
+    setDadosEnd(response.results[0].formatted_address)
   }
 
   return (
@@ -165,7 +165,7 @@ export default function CreateLocalization() {
           </p>
           <p>
             <b>Velocidade:</b> {Math.floor(Number(vehicleConsultData.speed))}{' '}
-            Km/H
+            km/h
           </p>
           <p>
             <b>Ignição:</b> {vehicleConsultData.ligado ? 'Ligado' : 'Desligado'}

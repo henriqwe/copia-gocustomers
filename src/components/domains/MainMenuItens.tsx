@@ -5,7 +5,7 @@ import rotas from './routes'
 export default {
   erp: [
     {
-      title: 'Dashboard',
+      title: 'Início',
       icon: <HomeIcon className="w-4 h-4 mx-4" />,
       url: rotas.erp.home,
       children: []
@@ -31,22 +31,6 @@ export default {
           icon: <ChipIcon className="w-4 h-4 mx-4" />
         }
       ]
-    }
-  ],
-  rastreamento: [
-    {
-      title: 'Início',
-      icon: <HomeIcon className="w-4 h-4 mx-4" />,
-      url: rotas.erp.home,
-      children: []
-    }
-  ],
-  assistencia: [
-    {
-      title: 'Início',
-      icon: <HomeIcon className="w-4 h-4 mx-4" />,
-      url: rotas.assistencia.home,
-      children: []
     }
   ]
 }

@@ -9,13 +9,5 @@ export default {
     },
     index: '/erp'
   },
-  assistencia: {
-    home: '/assistencia/',
-    index: '/assistencia/'
-  },
-  rastreamento: {
-    home: '/rastreamento/',
-    index: '/rastreamento/'
-  },
   login: '/login/'
 } as const

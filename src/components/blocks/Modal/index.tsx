@@ -73,7 +73,7 @@ export default function Modal({
                 >
                   <div
                     className={`absolute  left-0 flex pt-4 pr-2 -ml-8 sm:-ml-10 sm:pr-4 ${
-                      chevronDoubleRightIcon ? 'top-1/2' : 'top-0'
+                      chevronDoubleRightIcon ? 'items-center h-full' : 'top-0'
                     }`}
                   >
                     <button
@@ -81,7 +81,7 @@ export default function Modal({
                       type="button"
                       className={` ${
                         chevronDoubleRightIcon
-                          ? 'rounded-l-md px-2 py-2 dark:bg-dark-3'
+                          ? 'rounded-l-md px-2 py-2 bg-theme-9  text-dark-7 h-20'
                           : 'text-gray-300 rounded-md hover:text-white focus:outline-none focus:ring-2 focus:ring-white'
                       }`}
                       onClick={() =>
