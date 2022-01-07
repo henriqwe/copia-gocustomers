@@ -5,7 +5,7 @@ const InternalNavigation = () => {
   return (
     <button
       onClick={() => handler()}
-      className="rounded-l-md px-2 py-2 bg-theme-9  text-dark-7 h-full w-full"
+      className="rounded-l-md px-1 py-2 bg-theme-9  text-dark-7 h-full w-full"
     >
       <ChevronDoubleLeftIcon className="w-6 h-6" />
     </button>

@@ -1,4 +1,4 @@
-import { Dispatch, Fragment, SetStateAction } from 'react'
+import { Dispatch, Fragment, ReactNode, SetStateAction } from 'react'
 
 import Link from '@/common/Link'
 
@@ -13,6 +13,7 @@ type Props = {
   currentLocation: { title: string; url: string }[]
   setOpen: Dispatch<SetStateAction<boolean>>
   setShowModal: Dispatch<SetStateAction<boolean>>
+  children?: ReactNode
 }
 
 const Breadcrumb = ({
@@ -20,7 +21,8 @@ const Breadcrumb = ({
   reload,
   currentLocation,
   setOpen,
-  setShowModal
+  setShowModal,
+  children = null
 }: Props) => {
   return (
     <div className="flex items-center justify-between flex-1">
@@ -42,6 +44,7 @@ const Breadcrumb = ({
         <div className="text-xl">{title}</div>
       </div>
       <div className="flex items-center justify-center gap-4 divide-x divide-green-500">
+        {children}
         <ReloadPage reload={reload} />
         <div className="flex items-center">
           <ChangeTheme />

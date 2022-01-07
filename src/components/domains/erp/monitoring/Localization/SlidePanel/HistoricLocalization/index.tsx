@@ -90,57 +90,42 @@ export default function CreateLocalization() {
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        data-testid="inserirForm"
-        className="flex flex-col items-end"
-      >
-        <div className="grid grid-flow-col w-full gap-2 mb-2">
-          <div className="col-span-11 ">
-            <Controller
-              control={control}
-              name="Veiculos"
-              render={({ field: { onChange, value } }) => (
-                <div>
-                  <form.Select
-                    itens={
-                      allUserVehicle
-                        ? allUserVehicle
-                            .filter((item) => {
-                              if (item.placa != null) return item
-                            })
-                            .map((item) => {
-                              return {
-                                key: item.carro_id,
-                                title: item.placa as string
-                              }
-                            })
-                        : []
-                    }
-                    value={value}
-                    onChange={(value) => {
-                      onChange(value)
-                      showVehicleInfo(value)
-                      setDadosEnd('')
-                    }}
-                    error={errors.Cliente_Id}
-                    label="Veiculos"
-                  />
-                </div>
-              )}
-            />
-          </div>
+      <div className="grid grid-flow-col w-full gap-2 mb-2">
+        <Controller
+          control={control}
+          name="Veiculos"
+          render={({ field: { onChange, value } }) => (
+            <div>
+              <form.Select
+                itens={
+                  allUserVehicle
+                    ? allUserVehicle
+                        .filter((item) => {
+                          if (item.placa != null) return item
+                        })
+                        .map((item) => {
+                          return {
+                            key: item.carro_id,
+                            title: item.placa as string
+                          }
+                        })
+                    : []
+                }
+                value={value}
+                onChange={(value) => {
+                  onChange(value)
+                  showVehicleInfo(value)
+                  centerVehicleInMap(Number(value.key))
+                  setDadosEnd('')
+                }}
+                error={errors.Cliente_Id}
+                label="Veiculos"
+              />
+            </div>
+          )}
+        />
+      </div>
 
-          <buttons.SecondaryButton
-            className="col-span-1"
-            buttonClassName="w-full justify-center"
-            title="Exibir no Mapa"
-            handler={() => {
-              return
-            }}
-          />
-        </div>
-      </form>
       <common.Separator />
       {vehicleConsultData && (
         <div className="w-full mt-4">

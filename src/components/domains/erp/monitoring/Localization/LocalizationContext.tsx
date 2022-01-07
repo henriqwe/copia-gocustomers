@@ -41,6 +41,8 @@ type coordsToCenterMap = {
   carro_id?: number
 }
 type LocalizationContextProps = {
+  setVehicleConsultData?: Dispatch<SetStateAction<vehicle | undefined>>
+  vehicleConsultData?: vehicle
   coordsToCenterMap?: coordsToCenterMap
   vehicleLocationInfo?: vehicle
   allUserVehicle?: vehicle[]
@@ -76,6 +78,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     open: false
   })
   const [vehicleLocationInfo, setVehicleLocationInfo] = useState()
+  const [vehicleConsultData, setVehicleConsultData] = useState<vehicle>()
   const [allUserVehicle, setAllUserVehicle] = useState<vehicle[]>([])
   const [coordsToCenterMap, setCoordsToCenterMap] = useState<coordsToCenterMap>(
     {}
@@ -131,7 +134,9 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
         setAllUserVehicle,
         centerVehicleInMap,
         coordsToCenterMap,
-        localizationsLoading
+        localizationsLoading,
+        vehicleConsultData,
+        setVehicleConsultData
       }}
     >
       {children}

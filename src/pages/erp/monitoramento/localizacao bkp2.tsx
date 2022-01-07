@@ -45,7 +45,8 @@ export function Page() {
     localizationsRefetch,
     localizationsLoading,
     allUserVehicle,
-    coordsToCenterMap
+    coordsToCenterMap,
+    vehicleConsultData
   } = localizations.useLocalization()
 
   let google: any
@@ -54,6 +55,7 @@ export function Page() {
     google.maps.Marker[]
   >([])
   const [mapa, setMapa] = useState<google.maps.Map>()
+  const [layoutType, setLayoutType] = useState(false)
 
   function initMap() {
     const loader = new Loader({
@@ -154,16 +156,23 @@ export function Page() {
         { title: 'Dashboard', url: rotas.erp.home },
         { title: 'Localização', url: rotas.erp.monitoramento.localizacao }
       ]}
+      layoutType={layoutType}
+      setLayoutType={setLayoutType}
     >
-      <div className="absolute z-50 h-5/6 right-0 flex items-center">
-        <div className="h-20 w-7">
-          <localizations.InternalNavigation />
+      {!layoutType && (
+        <div className="absolute z-50 h-5/6 right-0 flex items-center">
+          <div className="h-20 w-7">
+            <localizations.InternalNavigation />
+          </div>
         </div>
-      </div>
+      )}
 
       <localizations.SlidePanel />
       <div className="h-full w-full">
         <div className="w-full h-full" id="googleMaps" />
+        {layoutType && (
+          <VehicleDetails vehicleConsultData={vehicleConsultData} />
+        )}
       </div>
     </MapTemplate>
   )
@@ -286,4 +295,89 @@ function updateVehicleMarker(
   marker.addListener('mouseout', () => {
     infowindow.close()
   })
+}
+
+function VehicleDetails({ vehicleConsultData }) {
+  const [dataAddres, setDataAddres] = useState('')
+  const [open, setOpen] = useState(true)
+
+  async function getStreetName(vehicleConsultData: vehicle) {
+    const response = await getStreetNameByLatLng(
+      vehicleConsultData.latitude,
+      vehicleConsultData.longitude
+    )
+
+    setDataAddres(response.results[0].formatted_address)
+  }
+
+  useEffect(() => {
+    setDataAddres('')
+    setOpen(true)
+  }, [vehicleConsultData])
+
+  return (
+    <>
+      {vehicleConsultData && open && (
+        <div className="absolute h-48 w-80 -mt-56 ml-8 bg-dark-3 z-40 rounded-md overflow-auto">
+          <div className="flex w-full bg-dark-7 p-2 justify-between items-center">
+            {' '}
+            <span className="font-black">Informações sobre o veículo</span>
+            <button
+              data-testid="button"
+              type="button"
+              className="text-gray-300 rounded-md hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+              onClick={() => setOpen(false)}
+            >
+              <span className="sr-only">Fechar painel</span>
+
+              <XIcon className="w-6 h-6" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="p-2">
+            <p>
+              <b>Última atualização:</b>{' '}
+              {new Date(vehicleConsultData.date_rastreador).toLocaleDateString(
+                'pt-br',
+                {
+                  dateStyle: 'short'
+                }
+              )}{' '}
+              {new Date(vehicleConsultData.date_rastreador).toLocaleTimeString(
+                'pt-br',
+                {
+                  timeStyle: 'medium'
+                }
+              )}
+            </p>
+            <p>
+              <b>Placa:</b> {vehicleConsultData.placa}
+            </p>
+            <p>
+              <b>Velocidade:</b> {Math.floor(Number(vehicleConsultData.speed))}{' '}
+              km/h
+            </p>
+            <p>
+              <b>Ignição:</b>{' '}
+              {vehicleConsultData.ligado ? 'Ligado' : 'Desligado'}
+            </p>
+            <p>
+              <b>Endereço:</b>{' '}
+              {dataAddres ? (
+                <span>{dataAddres}</span>
+              ) : (
+                <button
+                  className="underline"
+                  onClick={() => {
+                    getStreetName(vehicleConsultData)
+                  }}
+                >
+                  Clique aqui para consultar
+                </button>
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
