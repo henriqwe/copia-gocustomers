@@ -126,7 +126,7 @@ export function Page() {
   }, [allUserVehicle])
 
   useEffect(() => {
-    centerMapInVehicle(coordsToCenterMap, mapa)
+    centerMapInVehicle(coordsToCenterMap, mapa, allMarkerVehicles)
   }, [coordsToCenterMap])
 
   return (
@@ -200,12 +200,27 @@ function setVehicleColor(vehicle: vehicle) {
 }
 
 function centerMapInVehicle(
-  coords: { lat: number; lng: number } | undefined,
-  map: google.maps.Map | undefined
+  coords: { lat: number; lng: number; carro_id: number } | undefined,
+  map: google.maps.Map | undefined,
+  allMarkerVehicles: google.maps.Marker[]
 ) {
   if (map && coords) {
     map.setCenter(coords)
     map.setZoom(19)
+  }
+  const marker = allMarkerVehicles.find((vehicleMarker) => {
+    if (vehicleMarker.id === coords?.carro_id) return vehicleMarker
+  })
+
+  if (marker) {
+    const icon = marker.getIcon()
+    const color = icon.fillColor
+    icon.fillColor = '#fffb00'
+    marker.setIcon(icon)
+    setTimeout(() => {
+      icon.fillColor = color
+      marker.setIcon(icon)
+    }, 1000)
   }
 }
 
@@ -221,8 +236,8 @@ function updateVehicleMarker(
   marker.setPosition(currentMarkerPos)
 
   const icon = marker.getIcon()
-  icon!.fillColor = setVehicleColor(vehicle)
-  icon!.rotation = Number(vehicle.crs)
+  icon.fillColor = setVehicleColor(vehicle)
+  icon.rotation = Number(vehicle.crs)
   marker.setIcon(icon)
 
   const infowindow = new google.maps.InfoWindow({

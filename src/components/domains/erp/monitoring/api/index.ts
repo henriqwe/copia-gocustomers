@@ -25,6 +25,7 @@ export async function getAllUserVehicles(email: string) {
     )
     return data
   } catch (err: any) {
+    console.log(err)
     showError(err)
   }
 }
@@ -56,10 +57,7 @@ export async function getStreetNameByLatLng(
     const { data } = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I`
     )
-    if (data.status === 'REQUEST_DENIED') {
-      showError(data)
-      return
-    }
+
     return data
   } catch (err: any) {
     showError(err)

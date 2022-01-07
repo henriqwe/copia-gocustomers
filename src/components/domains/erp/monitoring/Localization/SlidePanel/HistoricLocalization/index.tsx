@@ -176,11 +176,12 @@ export default function CreateLocalization() {
               <span>{dadosEnd}</span>
             ) : (
               <button
+                className="underline"
                 onClick={() => {
                   getStreetName(vehicleConsultData)
                 }}
               >
-                Click aqui para consultar
+                Clique aqui para consultar
               </button>
             )}
           </p>

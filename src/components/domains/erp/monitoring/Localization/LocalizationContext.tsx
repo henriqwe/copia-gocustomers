@@ -34,8 +34,13 @@ type vehicle = {
   imei?: string
   date_rastreador?: string
 }
+type coordsToCenterMap = {
+  lat?: number
+  lng?: number
+  carro_id?: number
+}
 type LocalizationContextProps = {
-  coordsToCenterMap?: { lat: number; lng: number }
+  coordsToCenterMap?: coordsToCenterMap
   vehicleLocationInfo?: vehicle
   allUserVehicle?: vehicle[]
   slidePanelState: SlidePanelStateType
@@ -71,10 +76,9 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
   })
   const [vehicleLocationInfo, setVehicleLocationInfo] = useState()
   const [allUserVehicle, setAllUserVehicle] = useState<vehicle[]>([])
-  const [coordsToCenterMap, setCoordsToCenterMap] = useState({
-    lat: -12.100100128939063,
-    lng: -49.24919742233473
-  })
+  const [coordsToCenterMap, setCoordsToCenterMap] = useState<coordsToCenterMap>(
+    {}
+  )
 
   const localizationSchema = yup.object().shape({
     Colaborador_Id: yup.object(),
@@ -88,7 +92,8 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     if (vehicle) {
       setCoordsToCenterMap({
         lat: Number(vehicle[0].latitude),
-        lng: Number(vehicle[0].longitude)
+        lng: Number(vehicle[0].longitude),
+        carro_id: vehicle[0].carro_id
       })
     }
   }
