@@ -99,17 +99,10 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
   }
 
   async function updateAllUserVehiclesLocations() {
-    let responseGetUserVehicles = await getAllUserVehicles(
+    const responseGetUserVehicles = await getAllUserVehicles(
       'operacional@radarescolta.com'
     )
-    setAllUserVehicle(responseGetUserVehicles)
-
-    setInterval(async () => {
-      responseGetUserVehicles = await getAllUserVehicles(
-        'operacional@radarescolta.com'
-      )
-      setAllUserVehicle(responseGetUserVehicles)
-    }, 30000)
+    if (responseGetUserVehicles) setAllUserVehicle(responseGetUserVehicles)
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,6 +112,9 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     // )
     // setVehicleLocationInfo(responseGetVehicleLocationRealTime)
     updateAllUserVehiclesLocations()
+    setInterval(async () => {
+      updateAllUserVehiclesLocations()
+    }, 30000)
   }, [])
 
   return (

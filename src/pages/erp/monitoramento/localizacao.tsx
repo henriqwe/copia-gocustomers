@@ -190,6 +190,11 @@ function createNewVehicleMarker(
 }
 
 function setVehicleColor(vehicle: vehicle) {
+  const dataHora = new Date()
+  dataHora.setHours(dataHora.getHours() - 1)
+
+  if (new Date(vehicle.date_rastreador) < dataHora) return '#ff0000'
+
   if (vehicle.ligado) {
     if (Number(vehicle.speed).toFixed() === '0') return '#22ade4'
 
