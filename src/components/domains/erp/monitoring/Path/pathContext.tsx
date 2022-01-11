@@ -8,7 +8,7 @@ import {
   useState
 } from 'react'
 import * as yup from 'yup'
-import { getAllUserVehicles } from '../api'
+import { getVehicleHistoric, getAllUserVehicles } from '../api'
 
 type vehicle = {
   crs: string
@@ -40,22 +40,30 @@ type coordsToCenterMap = {
   lng?: number
   carro_id?: number
 }
-type LocalizationContextProps = {
+type PathContextProps = {
   setVehicleConsultData?: Dispatch<SetStateAction<vehicle | undefined>>
-  vehicleConsultData?: vehicle
+  vehicleConsultData?: vehicle[]
   allUserVehicle?: vehicle[]
   coordsToCenterMap?: coordsToCenterMap
   vehicleLocationInfo?: vehicle
+  vehicleHistoric?: vehicle | undefined
   slidePanelState: SlidePanelStateType
   setSlidePanelState: Dispatch<SetStateAction<SlidePanelStateType>>
   collaboratorsRefetch: () => void
-  localizationsLoading: boolean
-  localizationsRefetch: () => void
-  createLocalizationLoading: boolean
-  softDeleteLocalizationLoading: boolean
-  updateLocalizationLoading: boolean
-  localizationSchema: any
+  pathsLoading: boolean
+  pathsRefetch: () => void
+  createPathLoading: boolean
+  softDeletePathLoading: boolean
+  updatePathLoading: boolean
+  pathSchema: any
+  coordsToCenterPointInMap: coordsToCenterMap
+  setCoordsToCenterPointInMap: Dispatch<SetStateAction<coordsToCenterMap>>
   centerVehicleInMap?: (carroId: number) => void
+  consultVehicleHistoric?: (
+    carro_id: string,
+    inicio: string,
+    fim: string
+  ) => void
 }
 
 type ProviderProps = {
@@ -68,29 +76,33 @@ type SlidePanelStateType = {
   open: boolean
 }
 
-export const LocalizationContext = createContext<LocalizationContextProps>(
-  {} as LocalizationContextProps
+export const PathContext = createContext<PathContextProps>(
+  {} as PathContextProps
 )
 
-export const LocalizationProvider = ({ children }: ProviderProps) => {
+export const PathProvider = ({ children }: ProviderProps) => {
   const [slidePanelState, setSlidePanelState] = useState<SlidePanelStateType>({
     type: 'create',
     open: false
   })
   const [vehicleLocationInfo, setVehicleLocationInfo] = useState()
-  const [vehicleConsultData, setVehicleConsultData] = useState<vehicle>()
-  const [allUserVehicle, setAllUserVehicle] = useState<vehicle[]>([])
+  const [vehicleConsultData, setVehicleConsultData] = useState<vehicle[]>()
+  const [vehicleHistoric, setVehicleHistoric] = useState<vehicle>()
   const [coordsToCenterMap, setCoordsToCenterMap] = useState<coordsToCenterMap>(
     {}
   )
-  const [localizationsLoading, setLocalizationsLoading] = useState(false)
+  const [coordsToCenterPointInMap, setCoordsToCenterPointInMap] =
+    useState<coordsToCenterMap>({})
+  const [allUserVehicle, setAllUserVehicle] = useState<vehicle[]>([])
 
-  const localizationSchema = yup.object().shape({
+  const [pathsLoading, setPathsLoading] = useState(false)
+
+  const pathSchema = yup.object().shape({
     Colaborador_Id: yup.object(),
     Cliente_Id: yup.object()
   })
   function centerVehicleInMap(carroId: number) {
-    const vehicle = allUserVehicle?.filter((elem: vehicle) => {
+    const vehicle = vehicleHistoric?.filter((elem: vehicle) => {
       if (elem.carro_id === carroId) return elem
     })
 
@@ -102,48 +114,57 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
       })
     }
   }
-  async function localizationsRefetch() {
-    await updateAllUserVehiclesLocations()
+  async function pathsRefetch() {
+    return
   }
   async function updateAllUserVehiclesLocations() {
-    setLocalizationsLoading(true)
     const responseGetUserVehicles = await getAllUserVehicles(
       'operacional@radarescolta.com'
     )
     if (responseGetUserVehicles) setAllUserVehicle(responseGetUserVehicles)
-    setLocalizationsLoading(false)
+  }
+  async function consultVehicleHistoric(
+    carro_id: string,
+    inicio: string,
+    fim: string
+  ) {
+    setPathsLoading(true)
+    const response = await getVehicleHistoric(carro_id, inicio, fim)
+    setVehicleConsultData(response)
+    setPathsLoading(false)
   }
 
   useEffect(() => {
     updateAllUserVehiclesLocations()
-    setInterval(async () => {
-      updateAllUserVehiclesLocations()
-    }, 30000)
   }, [])
 
   return (
-    <LocalizationContext.Provider
+    <PathContext.Provider
       value={{
-        localizationsRefetch,
+        pathsRefetch,
         slidePanelState,
         setSlidePanelState,
-        localizationSchema,
+        pathSchema,
         vehicleLocationInfo,
         setVehicleLocationInfo,
-        allUserVehicle,
-        setAllUserVehicle,
+        vehicleHistoric,
+        setVehicleHistoric,
         centerVehicleInMap,
         coordsToCenterMap,
-        localizationsLoading,
+        pathsLoading,
         vehicleConsultData,
-        setVehicleConsultData
+        setVehicleConsultData,
+        consultVehicleHistoric,
+        allUserVehicle,
+        coordsToCenterPointInMap,
+        setCoordsToCenterPointInMap
       }}
     >
       {children}
-    </LocalizationContext.Provider>
+    </PathContext.Provider>
   )
 }
 
-export const useLocalization = () => {
-  return useContext(LocalizationContext)
+export const usePath = () => {
+  return useContext(PathContext)
 }

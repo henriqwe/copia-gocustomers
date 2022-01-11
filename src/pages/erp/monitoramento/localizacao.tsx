@@ -149,7 +149,6 @@ export function Page() {
     <MapTemplate
       reload={{ action: localizationsRefetch, state: localizationsLoading }}
       title="Localização"
-      allUserVehicle={allUserVehicle}
       currentLocation={[
         { title: 'Dashboard', url: rotas.erp.home },
         { title: 'Localização', url: rotas.erp.monitoramento.localizacao }

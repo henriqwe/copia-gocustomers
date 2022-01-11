@@ -23,8 +23,13 @@ import GenericTitle from './GenericTitle'
 import ListRadioGroup from './ListRadioGroup'
 import UploadFile from './UploadFile'
 import UploadFilePDF from './UploadFilePDF'
+import Dropdown from './Dropdown'
+import VehicleCard from './VehicleCard'
+import ListCard from './ListCard'
 
 export {
+  VehicleCard,
+  ListCard,
   ActivityCard,
   AddForm,
   Breadcrumb,
@@ -49,5 +54,6 @@ export {
   GenericTitle,
   ListRadioGroup,
   UploadFile,
-  UploadFilePDF
+  UploadFilePDF,
+  Dropdown
 }

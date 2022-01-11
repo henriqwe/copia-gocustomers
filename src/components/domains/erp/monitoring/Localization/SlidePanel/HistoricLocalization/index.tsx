@@ -1,6 +1,5 @@
 import { Controller, useForm } from 'react-hook-form'
 import { useState } from 'react'
-import * as buttons from '@/common/Buttons'
 import * as form from '@/common/Form'
 import * as localizations from '@/domains/erp/monitoring/Localization'
 import * as common from '@/common'
@@ -8,6 +7,12 @@ import * as common from '@/common'
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup'
 import { showError } from 'utils/showError'
 import { getStreetNameByLatLng } from '../../../api'
+import {
+  ClockIcon,
+  ExclamationIcon,
+  LocationMarkerIcon,
+  MapIcon
+} from '@heroicons/react/solid'
 
 type vehicle = {
   crs: string
@@ -145,31 +150,49 @@ export default function CreateLocalization() {
               }
             )}
           </p>
-          <p>
-            <b>Placa:</b> {vehicleConsultData.placa}
-          </p>
-          <p>
-            <b>Velocidade:</b> {Math.floor(Number(vehicleConsultData.speed))}{' '}
-            km/h
-          </p>
-          <p>
-            <b>Ignição:</b> {vehicleConsultData.ligado ? 'Ligado' : 'Desligado'}
-          </p>
-          <p>
-            <b>Endereço:</b>{' '}
-            {dadosEnd ? (
-              <span>{dadosEnd}</span>
-            ) : (
-              <button
-                className="underline"
-                onClick={() => {
-                  getStreetName(vehicleConsultData)
-                }}
-              >
-                Clique aqui para consultar
-              </button>
-            )}
-          </p>
+          <div className="relative mt-5 report-timeline">
+            <common.ListCard
+              icon={<ExclamationIcon className="w-6 h-6" />}
+              title={'Placa'}
+              description={<p>{vehicleConsultData.placa}</p>}
+            />
+            <common.ListCard
+              icon={<LocationMarkerIcon className="w-6 h-6" />}
+              title={'Velocidade'}
+              description={
+                <p>{Math.floor(Number(vehicleConsultData.speed)) + ' Km/H'}</p>
+              }
+            />
+            <common.ListCard
+              icon={<ClockIcon className="w-6 h-6" />}
+              title={'Ignição'}
+              description={
+                <div>
+                  <p>{vehicleConsultData.ligado ? 'Ligado' : 'Desligado'}</p>
+                </div>
+              }
+            />
+            <common.ListCard
+              icon={<MapIcon className="w-6 h-6" />}
+              title={'Endereço'}
+              description={
+                dadosEnd ? (
+                  <span>{dadosEnd}</span>
+                ) : (
+                  <div>
+                    <button
+                      className="underline"
+                      onClick={() => {
+                        getStreetName(vehicleConsultData)
+                      }}
+                    >
+                      Clique aqui para consultar
+                    </button>
+                  </div>
+                )
+              }
+            />
+          </div>
         </div>
       )}
     </>

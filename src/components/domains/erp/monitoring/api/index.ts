@@ -37,7 +37,7 @@ export async function getVehicleHistoric(
 ) {
   try {
     const { data } = await axios.post(
-      'https://integration.chaser.com.br/mobile/api/veiculo/usuario',
+      'https://integration.chaser.com.br/mobile/api/veiculo/localizacao',
       {
         carro_id,
         inicio,
