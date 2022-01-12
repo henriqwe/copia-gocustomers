@@ -201,6 +201,30 @@ function createNewCarMarker(
     strokeOpacity: 1.0,
     strokeWeight: 4,
     geodesic: true,
+    icons: [
+      {
+        icon: {
+          // path: 'M 0,-1 0,1',
+          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          strokeOpacity: 1,
+          scale: 3.5,
+          strokeColor: '#000',
+          strokeWeight: 1,
+          fillColor: '#fff',
+          fillOpacity: 1
+        },
+        offset: '100%',
+        repeat: '300px'
+      }
+    ],
+    map
+  })
+  const lineForeground = new google.maps.Polyline({
+    path: [],
+    strokeColor: '#09ff00',
+    strokeOpacity: 1,
+    strokeWeight: 2,
+    geodesic: true,
     map
   })
 
@@ -208,13 +232,13 @@ function createNewCarMarker(
 
   function renderPolyline() {
     line.getPath().clear()
+    lineForeground.getPath().clear()
     let statusVehicle = pathCoords[0].ligado
     let timeLastStop = new Date(pathCoords[0].data)
 
     pathCoords.forEach((vehicle, index) => {
       let stop = false
       let durationMs = 0
-      console.log(statusVehicle)
       if (statusVehicle !== vehicle.ligado) {
         statusVehicle = vehicle.ligado
         if (statusVehicle === 0) {
@@ -242,6 +266,7 @@ function createNewCarMarker(
       )
       line.getPath().push(arrival)
     })
+    // animateCircle(line)
   }
 
   function createMarkerWhitInfo(
@@ -347,4 +372,17 @@ function centerPointInMap(coords, map, google, pointMarker, setPointMarker) {
   setTimeout(() => {
     markerPoint.setMap(null)
   }, 3000)
+}
+
+function animateCircle(line: google.maps.Polyline) {
+  let count = 0
+
+  window.setInterval(() => {
+    count = (count + 1) % 200
+
+    const icons = line.get('icons')
+
+    icons[0].offset = count / 2 + '%'
+    line.set('icons', icons)
+  }, 200)
 }
