@@ -266,7 +266,7 @@ function createNewCarMarker(
       )
       line.getPath().push(arrival)
     })
-    // animateCircle(line)
+    // animateIconPolyline(line)
   }
 
   function createMarkerWhitInfo(
@@ -325,15 +325,12 @@ function createNewCarMarker(
           fillOpacity: 1
         }
       })
-      markerlocal.addListener('mouseover', () => {
+      markerlocal.addListener('click', () => {
         infowindow.open({
           anchor: markerlocal,
           map,
           shouldFocus: false
         })
-      })
-      markerlocal.addListener('mouseout', () => {
-        infowindow.close()
       })
       markers.push(markerlocal)
     }
@@ -374,7 +371,7 @@ function centerPointInMap(coords, map, google, pointMarker, setPointMarker) {
   }, 3000)
 }
 
-function animateCircle(line: google.maps.Polyline) {
+function animateIconPolyline(line: google.maps.Polyline) {
   let count = 0
 
   window.setInterval(() => {

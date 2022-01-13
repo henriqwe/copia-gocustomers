@@ -1,6 +1,6 @@
 import rotas from '@/domains/routes'
 import * as localizations from '@/domains/erp/monitoring/Localization'
-import { XIcon } from '@heroicons/react/outline'
+import { InformationCircleIcon } from '@heroicons/react/solid'
 
 import { Loader } from '@googlemaps/js-api-loader'
 import { useEffect, useState } from 'react'
@@ -108,7 +108,6 @@ export function Page() {
         console.log('error: ', e)
       })
   }
-
   useEffect(() => {
     initMap()
   }, [])
@@ -189,22 +188,59 @@ function createNewVehicleMarker(
     }
   })
   const infowindow = new google.maps.InfoWindow({
-    content: `<div class='text-dark-7'>
-    <p><b>Placa:</b> ${vehicle.placa}</p>
-    <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} km/h</p>
-    <p><b>Ignição:</b> ${vehicle.ligado ? 'Ligado' : 'Desligado'}</p>
-    </div> `
+    content: `<div class='text-dark-7 w-80 m-0'>
+    <div class='grid grid-cols-3 bg-theme-22 '>
+    <div class='grid-span-1 flex justify-center font-semibold rounded-l-md py-2 border-2 !border-white '> ${
+      vehicle.placa
+    }</div>
+    <div class='grid-span-1  flex justify-center items-center font-semibold border-2  py-2 !border-white' >
+    <div class='mr-1 ${
+      vehicle.ligado
+        ? Number(vehicle.speed).toFixed() === '0'
+          ? 'text-theme-10'
+          : 'text-theme-9'
+        : 'text-theme-13'
+    }'>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="w-3 h-3"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+    </div><span>${
+      vehicle.ligado
+        ? Number(vehicle.speed).toFixed() === '0'
+          ? ' Parado'
+          : ' Ligado'
+        : ' Desligado'
+    }</span>
+    </div>
+    <div class='grid-span-1 flex justify-center font-semibold border-2 !border-white rounded-r-md py-2'>${Math.floor(
+      Number(vehicle.speed)
+    )} km/h</div> 
+    </div>
+    
+    <div class="my-2">
+    <p><b>Última atualização: ${new Date(
+      vehicle.date_rastreador
+    ).toLocaleDateString('pt-br', {
+      dateStyle: 'short'
+    })}
+    ${new Date(vehicle.date_rastreador).toLocaleTimeString('pt-br', {
+      timeStyle: 'medium'
+    })}</b> </p>
+    <p><b>${vehicle.veiculo}</b> </p>
+    <p><b>${'NOME DO MOTORISTA'}</b> </p>
+    <button class='underline' onclick="
+       alert('Em desenvolvimento')">Clique aqui para consultar o endereço<button>
+    </div>
+    <button class='bg-theme-9 py-2 dark:bg-theme-1 dark:text-white font-semibold w-full bottom-0 rounded-sm' onclick="
+    alert('Em desenvolvimento')">Ver trajeto<button>
+    </div>`
   })
-  marker.addListener('mouseover', () => {
+  marker.addListener('click', () => {
     infowindow.open({
       anchor: marker,
       map,
       shouldFocus: false
     })
   })
-  marker.addListener('mouseout', () => {
-    infowindow.close()
-  })
+
   allMarkerVehiclesStep.push(marker)
 }
 
@@ -275,24 +311,65 @@ function updateVehicleMarker(
   marker.setIcon(icon)
 
   const infowindow = new google.maps.InfoWindow({
-    content: `<div class='text-dark-7'>
-    <p><b>Placa:</b> ${vehicle.placa}</p>
-    <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} km/h</p>
-    <p><b>Ignição:</b> ${vehicle.ligado ? 'Ligado' : 'Desligado'}</p>
-    </div> `
+    content: `<div class='text-dark-7 w-80 m-0'>
+    <div class='grid grid-cols-3 bg-theme-22 '>
+    <div class='grid-span-1 flex justify-center font-semibold rounded-l-md py-2 border-2 !border-white '> ${
+      vehicle.placa
+    }</div>
+    <div class='grid-span-1  flex justify-center items-center font-semibold border-2  py-2 !border-white' >
+    <div class='mr-1 ${
+      vehicle.ligado
+        ? Number(vehicle.speed).toFixed() === '0'
+          ? 'text-theme-10'
+          : 'text-theme-9'
+        : 'text-theme-13'
+    }'>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="w-3 h-3"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+    </div><span>${
+      vehicle.ligado
+        ? Number(vehicle.speed).toFixed() === '0'
+          ? ' Parado'
+          : ' Ligado'
+        : ' Desligado'
+    }</span>
+    </div>
+    <div class='grid-span-1 flex justify-center font-semibold border-2 !border-white rounded-r-md py-2'>${Math.floor(
+      Number(vehicle.speed)
+    )} km/h</div> 
+    </div>
+    
+    <div class="my-2 grid gap-y-4">
+    <div>
+    <p><b>Última atualização: ${new Date(
+      vehicle.date_rastreador
+    ).toLocaleDateString('pt-br', {
+      dateStyle: 'short'
+    })}
+    ${new Date(vehicle.date_rastreador).toLocaleTimeString('pt-br', {
+      timeStyle: 'medium'
+    })}</b> </p>
+    </div>
+    <div>
+    <p><b>${vehicle.veiculo}</b> </p>
+    </div>
+    <div>
+    <p><b>${'NOME DO MOTORISTA'}</b> </p>
+    </div>
+    <button class='underline' onclick="
+       alert('Em desenvolvimento')">Clique aqui para consultar o endereço<button>
+    </div>
+    <button class='bg-theme-9 py-2 dark:bg-theme-1 dark:text-white font-semibold w-full bottom-0 rounded-sm' onclick="
+    alert('Em desenvolvimento')">Ver trajeto<button>
+    </div>`
   })
 
-  google.maps.event.clearListeners(marker, 'mouseover')
-  google.maps.event.clearListeners(marker, 'mouseout')
+  google.maps.event.clearListeners(marker, 'click')
 
-  marker.addListener('mouseover', () => {
+  marker.addListener('click', () => {
     infowindow.open({
       anchor: marker,
       map,
       shouldFocus: false
     })
-  })
-  marker.addListener('mouseout', () => {
-    infowindow.close()
   })
 }
