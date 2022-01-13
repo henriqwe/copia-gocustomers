@@ -300,46 +300,46 @@ function createNewCarMarker(
       </div> `
     }
 
-    if (true /*Number(vehicle.speed) > 80 || stop*/) {
-      const infowindow = new google.maps.InfoWindow({
-        content
-      })
+    // if (true /*Number(vehicle.speed) > 80 || stop*/) {
+    const infowindow = new google.maps.InfoWindow({
+      content
+    })
 
-      const markerlocal = new google.maps.Marker({
-        position: {
-          lat: Number(vehicle.latitude),
-          lng: Number(vehicle.longitude)
-        },
+    const markerlocal = new google.maps.Marker({
+      position: {
+        lat: Number(vehicle.latitude),
+        lng: Number(vehicle.longitude)
+      },
+      map,
+      zIndex: 1,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 5,
+        strokeWeight: 1,
+        fillColor:
+          previousPosition === undefined
+            ? '#000'
+            : stop
+            ? '#2600ff'
+            : Number(vehicle.speed) > 80
+            ? '#ff8800'
+            : '#000',
+        fillOpacity: 1
+      }
+    })
+    markerlocal.addListener('click', () => {
+      // const icon = markerlocal.getIcon()
+      // icon.strokeColor = 'yellow'
+      // markerlocal.setIcon(icon)
+      infowindow.open({
+        anchor: markerlocal,
         map,
-        zIndex: 1,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 5,
-          strokeWeight: 1,
-          fillColor:
-            previousPosition === undefined
-              ? '#000'
-              : stop
-              ? '#2600ff'
-              : Number(vehicle.speed) > 80
-              ? '#ff8800'
-              : '#000',
-          fillOpacity: 1
-        }
+        shouldFocus: false
       })
-      markerlocal.addListener('click', () => {
-        // const icon = markerlocal.getIcon()
-        // icon.strokeColor = 'yellow'
-        // markerlocal.setIcon(icon)
-        infowindow.open({
-          anchor: markerlocal,
-          map,
-          shouldFocus: false
-        })
-      })
+    })
 
-      markers.push(markerlocal)
-    }
+    markers.push(markerlocal)
+    // }
   }
 
   markers.push(marker)
