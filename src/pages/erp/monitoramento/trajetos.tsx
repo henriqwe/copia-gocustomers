@@ -300,7 +300,7 @@ function createNewCarMarker(
       </div> `
     }
 
-    if (Number(vehicle.speed) > 80 || stop) {
+    if (true /*Number(vehicle.speed) > 80 || stop*/) {
       const infowindow = new google.maps.InfoWindow({
         content
       })
@@ -321,17 +321,23 @@ function createNewCarMarker(
               ? '#000'
               : stop
               ? '#2600ff'
-              : '#ff8800',
+              : Number(vehicle.speed) > 80
+              ? '#ff8800'
+              : '#000',
           fillOpacity: 1
         }
       })
       markerlocal.addListener('click', () => {
+        // const icon = markerlocal.getIcon()
+        // icon.strokeColor = 'yellow'
+        // markerlocal.setIcon(icon)
         infowindow.open({
           anchor: markerlocal,
           map,
           shouldFocus: false
         })
       })
+
       markers.push(markerlocal)
     }
   }

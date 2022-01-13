@@ -173,7 +173,24 @@ export default function CreatePath() {
       return hours + ':' + minutes + ':' + seconds
     }
   }
-
+  function getAverageSpeed() {
+    if (vehicleConsultData) {
+      const vehicleConsultDataFiltredEngineRunnig = vehicleConsultData.filter(
+        (vehicle) => {
+          if (vehicle.ligado === 1 && Number(vehicle.speed) > 0) return vehicle
+        }
+      )
+      const sumSpeed = vehicleConsultDataFiltredEngineRunnig.reduce(
+        (acc, cur) => {
+          return acc + Number(cur.speed)
+        },
+        0
+      )
+      console.log(vehicleConsultData)
+      console.log(vehicleConsultDataFiltredEngineRunnig)
+      return (sumSpeed / vehicleConsultDataFiltredEngineRunnig.length).toFixed()
+    }
+  }
   useEffect(() => {
     setVehicleConsultData(undefined)
     reset({
@@ -356,6 +373,15 @@ export default function CreatePath() {
                   icon={<ClockIcon className="w-6 h-6" />}
                   title={'Tempo parado'}
                   description={<p>{getTotalDownTime()}</p>}
+                />
+                <common.ListCard
+                  icon={<MapIcon className="w-6 h-6" />}
+                  title={'Velocidade média'}
+                  description={
+                    <div>
+                      <p>{getAverageSpeed() + ' Km'}</p>
+                    </div>
+                  }
                 />
                 <common.ListCard
                   icon={<MapIcon className="w-6 h-6" />}
