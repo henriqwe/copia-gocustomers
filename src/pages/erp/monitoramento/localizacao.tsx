@@ -48,7 +48,7 @@ export function Page() {
     coordsToCenterMap
   } = localizations.useLocalization()
 
-  let google: any
+  const [google, setGoogle] = useState()
   const allMarkerVehiclesStep: google.maps.Marker[] = []
   const [allMarkerVehicles, setAllMarkerVehicles] = useState<
     google.maps.Marker[]
@@ -75,8 +75,8 @@ export function Page() {
     loader
       .load()
       .then((response) => {
-        google = response
-        const mapGoogle = new google.maps.Map(
+        setGoogle(response)
+        const mapGoogle = new response.maps.Map(
           document.getElementById('googleMaps') as HTMLElement,
           {
             center: {
@@ -84,7 +84,7 @@ export function Page() {
               lng: -49.24919742233473
             },
             zoom: 5,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: response.maps.MapTypeId.ROADMAP
           }
         )
         mapGoogle.setOptions({ styles })
@@ -98,7 +98,7 @@ export function Page() {
           console.log('click')
         })
         controlDiv.appendChild(controlUI)
-        mapGoogle.controls[google.maps.ControlPosition.LEFT_CENTER].push(
+        mapGoogle.controls[response.maps.ControlPosition.LEFT_CENTER].push(
           controlDiv
         )
 
@@ -142,7 +142,7 @@ export function Page() {
   }, [allUserVehicle])
 
   useEffect(() => {
-    centerMapInVehicle(coordsToCenterMap, mapa, allMarkerVehicles)
+    if (coordsToCenterMap && google) centerMapInVehicle(coordsToCenterMap, mapa)
   }, [coordsToCenterMap])
 
   return (
@@ -225,27 +225,37 @@ function setVehicleColor(vehicle: vehicle) {
 
 function centerMapInVehicle(
   coords: { lat: number; lng: number; carro_id: number } | undefined,
-  map: google.maps.Map | undefined,
-  allMarkerVehicles: google.maps.Marker[]
+  map: google.maps.Map | undefined
 ) {
   if (map && coords) {
     map.setCenter(coords)
-    map.setZoom(16)
+    map.setZoom(18)
   }
-  const marker = allMarkerVehicles.find((vehicleMarker) => {
-    if (vehicleMarker.id === coords?.carro_id) return vehicleMarker
-  })
 
-  if (marker) {
-    const icon = marker.getIcon()
-    const color = icon.fillColor
-    icon.fillColor = '#fffb00'
-    marker.setIcon(icon)
-    setTimeout(() => {
-      icon.fillColor = color
-      marker.setIcon(icon)
-    }, 5000)
-  }
+  const circleMarker = new google.maps.Marker({
+    map,
+    zIndex: 1,
+    position: coords,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 20,
+      strokeWeight: 1,
+      strokeColor: 'red',
+      fillColor: 'yellow',
+      fillOpacity: 1
+    }
+  })
+  const intervalColor = setInterval(() => {
+    const icon = circleMarker.getIcon()
+    if (icon.fillOpacity <= 0.01) {
+      circleMarker.setMap(null)
+      clearInterval(intervalColor)
+    }
+    icon.fillOpacity -= 0.01
+    icon.strokeOpacity -= 0.01
+
+    circleMarker.setIcon(icon)
+  }, 30)
 }
 
 function updateVehicleMarker(
