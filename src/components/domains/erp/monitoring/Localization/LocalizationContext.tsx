@@ -56,6 +56,8 @@ type LocalizationContextProps = {
   updateLocalizationLoading: boolean
   localizationSchema: any
   centerVehicleInMap?: (carroId: number) => void
+  vehicleOnFocusId: number | undefined
+  setVehicleOnFocusId: Dispatch<SetStateAction<number | undefined>>
 }
 
 type ProviderProps = {
@@ -84,7 +86,7 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
     {}
   )
   const [localizationsLoading, setLocalizationsLoading] = useState(false)
-
+  const [vehicleOnFocusId, setVehicleOnFocusId] = useState<number>()
   const localizationSchema = yup.object().shape({
     Colaborador_Id: yup.object(),
     Cliente_Id: yup.object()
@@ -136,7 +138,9 @@ export const LocalizationProvider = ({ children }: ProviderProps) => {
         coordsToCenterMap,
         localizationsLoading,
         vehicleConsultData,
-        setVehicleConsultData
+        setVehicleConsultData,
+        vehicleOnFocusId,
+        setVehicleOnFocusId
       }}
     >
       {children}

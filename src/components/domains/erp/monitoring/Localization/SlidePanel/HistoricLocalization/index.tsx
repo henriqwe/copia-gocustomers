@@ -1,5 +1,7 @@
 import { Controller, useForm } from 'react-hook-form'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+import * as buttons from '@/common/Buttons'
 import * as form from '@/common/Form'
 import * as localizations from '@/domains/erp/monitoring/Localization'
 import * as common from '@/common'
@@ -13,6 +15,7 @@ import {
   LocationMarkerIcon,
   MapIcon
 } from '@heroicons/react/solid'
+import Link from 'next/link'
 
 type vehicle = {
   crs: string
@@ -52,12 +55,19 @@ type vehicleToConsult = {
   type: string
 }
 export default function CreateLocalization() {
-  const { localizationSchema, allUserVehicle, centerVehicleInMap } =
-    localizations.useLocalization()
+  const {
+    localizationSchema,
+    allUserVehicle,
+    centerVehicleInMap,
+    vehicleConsultData,
+    setVehicleConsultData,
+    setVehicleOnFocusId
+  } = localizations.useLocalization()
   const {
     handleSubmit,
     formState: { errors },
-    control
+    control,
+    reset
   } = useForm({
     resolver: yupResolver(localizationSchema)
   })
@@ -73,7 +83,6 @@ export default function CreateLocalization() {
     }
   }
 
-  const [vehicleConsultData, setVehicleConsultData] = useState<vehicle>()
   const [dadosEnd, setDadosEnd] = useState('')
 
   function showVehicleInfo(vehicle: vehicleToConsult) {
@@ -84,14 +93,27 @@ export default function CreateLocalization() {
     if (vehicleData) setVehicleConsultData(vehicleData[0])
   }
 
-  async function getStreetName(vehicleConsultData: vehicle) {
+  async function getStreetName(vehicle: vehicle) {
     const response = await getStreetNameByLatLng(
-      vehicleConsultData.latitude,
-      vehicleConsultData.longitude
+      vehicle.latitude,
+      vehicle.longitude
     )
 
     setDadosEnd(response.results[0].formatted_address)
   }
+
+  useEffect(() => {
+    if (vehicleConsultData) {
+      getStreetName(vehicleConsultData)
+
+      reset({
+        Veiculos: {
+          key: vehicleConsultData.carro_id,
+          title: vehicleConsultData.placa
+        }
+      })
+    }
+  }, [vehicleConsultData])
 
   return (
     <>
@@ -122,6 +144,7 @@ export default function CreateLocalization() {
                   showVehicleInfo(value)
                   centerVehicleInMap(Number(value.key))
                   setDadosEnd('')
+                  setVehicleOnFocusId(Number(value.key))
                 }}
                 error={errors.Cliente_Id}
                 label="Veiculos"
@@ -134,7 +157,18 @@ export default function CreateLocalization() {
       <common.Separator />
       {vehicleConsultData && (
         <div className="w-full mt-4">
-          <p className="font-black text-lg">Informações sobre o veículo</p>
+          <div className="flex justify-between items-center">
+            <p className="font-black text-lg">Informações sobre o veículo</p>
+            <Link
+              href={`/erp/monitoramento/trajetos/${vehicleConsultData.carro_id}?placa=${vehicleConsultData.placa}`}
+            >
+              <buttons.PrimaryButton
+                title="Ver trajeto"
+                className="col-span-3 justify-center flex"
+              />
+            </Link>
+          </div>
+
           <p>
             <b>Última atualização:</b>{' '}
             {new Date(vehicleConsultData.date_rastreador).toLocaleDateString(
@@ -176,20 +210,7 @@ export default function CreateLocalization() {
               icon={<MapIcon className="w-6 h-6" />}
               title={'Endereço'}
               description={
-                dadosEnd ? (
-                  <span>{dadosEnd}</span>
-                ) : (
-                  <div>
-                    <button
-                      className="underline"
-                      onClick={() => {
-                        getStreetName(vehicleConsultData)
-                      }}
-                    >
-                      Clique aqui para consultar
-                    </button>
-                  </div>
-                )
+                dadosEnd ? <span>{dadosEnd}</span> : <span>Buscando...</span>
               }
             />
           </div>
