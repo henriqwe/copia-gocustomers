@@ -272,14 +272,14 @@ function createNewCarMarker(
       color: 'black',
       fontSize: '16px',
       fontWeight: 'bold',
-      className: 'mb-16'
+      className: 'mb-5 ml-4'
     },
     icon: {
-      path: 'M0-48c-9.8 0-17.7 7.8-17.7 17.4 0 15.5 17.7 30.6 17.7 30.6s17.7-15.4 17.7-30.6c0-9.6-7.9-17.4-17.7-17.4z',
-      fillColor: '#FF0000',
+      path: 'M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z',
+      fillColor: 'green',
       fillOpacity: 1,
-      anchor: new google.maps.Point(0, 0),
-      scale: 0.5
+      anchor: new google.maps.Point(10, 0),
+      scale: 1.5
     },
     position: {
       lat: Number(pathCoords[0].latitude),
