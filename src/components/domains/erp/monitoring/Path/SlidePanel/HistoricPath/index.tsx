@@ -15,6 +15,8 @@ import {
   LocationMarkerIcon,
   MapIcon
 } from '@heroicons/react/solid'
+import { useRouter } from 'next/router'
+import Skeleton from 'react-loading-skeleton'
 
 type vehicle = {
   crs: string
@@ -51,6 +53,7 @@ type FormData = {
 }
 export default function CreatePath() {
   const [moreDetails, setMoreDetails] = useState(false)
+  const router = useRouter()
 
   const {
     pathSchema,
@@ -58,7 +61,8 @@ export default function CreatePath() {
     consultVehicleHistoric,
     allUserVehicle,
     vehicleConsultData,
-    setVehicleConsultData
+    setVehicleConsultData,
+    setSelectedVehicle
   } = paths.usePath()
   const {
     handleSubmit,
@@ -72,7 +76,10 @@ export default function CreatePath() {
     useState(vehicleConsultData)
   const onSubmit = (formData: FormData) => {
     try {
-      if (formData.Veiculos === undefined) {
+      if (
+        formData.Veiculos === undefined ||
+        formData.Veiculos.title === undefined
+      ) {
         throw new Error('Selectione um veículo')
       }
 
@@ -81,6 +88,12 @@ export default function CreatePath() {
         formData.DateStart,
         formData.DateEnd
       )
+      const selectedVehicle = allUserVehicle?.find((vehicleFind) => {
+        if (vehicleFind.carro_id === Number(formData.Veiculos.key)) {
+          return vehicleFind
+        }
+      })
+      setSelectedVehicle(selectedVehicle)
     } catch (err: any) {
       showError(err)
     }
@@ -131,7 +144,7 @@ export default function CreatePath() {
   }
 
   function getTotalStops() {
-    if (vehicleConsultData) {
+    if (vehicleConsultData?.length > 0) {
       let statusVehicle = vehicleConsultData[0].ligado
 
       return vehicleConsultData.reduce((totalStops, currPoint) => {
@@ -144,9 +157,10 @@ export default function CreatePath() {
         return totalStops
       }, 0)
     }
+    return 0
   }
   function getTotalDownTime() {
-    if (vehicleConsultData) {
+    if (vehicleConsultData?.length > 0) {
       let statusVehicle = vehicleConsultData[0].ligado
       let timeLastStop = new Date(vehicleConsultData[0].data)
 
@@ -172,9 +186,10 @@ export default function CreatePath() {
 
       return hours + ':' + minutes + ':' + seconds
     }
+    return '00:00:00'
   }
   function getAverageSpeed() {
-    if (vehicleConsultData) {
+    if (vehicleConsultData.length > 0) {
       const vehicleConsultDataFiltredEngineRunnig = vehicleConsultData.filter(
         (vehicle) => {
           if (vehicle.ligado === 1 && Number(vehicle.speed) > 0) return vehicle
@@ -186,18 +201,39 @@ export default function CreatePath() {
         },
         0
       )
-      console.log(vehicleConsultData)
-      console.log(vehicleConsultDataFiltredEngineRunnig)
+
       return (sumSpeed / vehicleConsultDataFiltredEngineRunnig.length).toFixed()
     }
+    return '0'
   }
+
   useEffect(() => {
     setVehicleConsultData(undefined)
+
     reset({
       DateStart: currentDateAndTime('onlyDate'),
-      DateEnd: currentDateAndTime()
+      DateEnd: currentDateAndTime(),
+      Veiculos: {
+        key: Number(router.query.carro_id),
+        title: router.query.placa
+      }
     })
-  }, [reset])
+  }, [reset, router])
+
+  useEffect(() => {
+    if (router.query.carro_id && allUserVehicle) {
+      const formData = {
+        Veiculos: {
+          key: Number(router.query.carro_id),
+          title: router.query.placa
+        },
+        DateStart: currentDateAndTime('onlyDate'),
+        DateEnd: currentDateAndTime()
+      }
+
+      onSubmit(formData)
+    }
+  }, [router, allUserVehicle])
 
   useEffect(() => {
     setVehicleConsultDataFiltered(vehicleConsultData)
@@ -332,21 +368,24 @@ export default function CreatePath() {
           </div>
 
           <common.Separator />
-          {vehicleConsultData && (
-            <div className="w-full mt-4">
-              <div className="flex justify-between items-center">
-                <p className="font-black text-lg">
-                  Informações sobre o trajeto
-                </p>
-                <buttons.SecondaryButton
-                  handler={() => {
-                    setMoreDetails(true)
-                    filterConsult('Visualizar todos')
-                  }}
-                  title="Mais detalhes"
-                  className="col-span-3 justify-center flex"
-                />
-              </div>
+          <div className="w-full mt-4">
+            <div className="flex justify-between items-center mb-4">
+              <p className="font-black text-lg">Informações sobre o trajeto</p>
+              <buttons.SecondaryButton
+                handler={() => {
+                  setMoreDetails(true)
+                  filterConsult('Visualizar todos')
+                }}
+                title="Mais detalhes"
+                className="col-span-3 justify-center flex"
+                disabled={
+                  pathsLoading ||
+                  vehicleConsultData?.length < 1 ||
+                  vehicleConsultData === undefined
+                }
+              />
+            </div>
+            {vehicleConsultData?.length > 0 ? (
               <div className="relative mt-5 report-timeline">
                 <common.ListCard
                   icon={<ExclamationIcon className="w-6 h-6" />}
@@ -389,21 +428,54 @@ export default function CreatePath() {
                   description={
                     <div>
                       <p>
-                        {(
-                          (Number(
-                            vehicleConsultData[vehicleConsultData.length - 1]
-                              .dist
-                          ) -
-                            Number(vehicleConsultData[0].dist)) /
-                          1000
-                        ).toFixed(1) + ' Km'}
+                        {vehicleConsultData?.length > 0
+                          ? (
+                              (Number(
+                                vehicleConsultData[
+                                  vehicleConsultData.length - 1
+                                ].dist
+                              ) -
+                                Number(vehicleConsultData[0].dist)) /
+                              1000
+                            ).toFixed(1) + ' Km'
+                          : '0 km'}
                       </p>
                     </div>
                   }
                 />
               </div>
-            </div>
-          )}
+            ) : pathsLoading ? (
+              <>
+                <div className=" w-full">
+                  {['', '', '', '', ''].map((_, index) => (
+                    <div key={index} className="mb-2 grid grid-cols-12 gap-2">
+                      <div className="col-span-2">
+                        <Skeleton
+                          baseColor="rgb(41, 49, 69)"
+                          highlightColor="rgb(63, 72, 101)"
+                          height={56}
+                          circle
+                        />
+                      </div>
+                      <div className="col-span-10">
+                        <Skeleton
+                          baseColor="rgb(41, 49, 69)"
+                          highlightColor="rgb(63, 72, 101)"
+                          height={56}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : vehicleConsultData ? (
+              <div className="w-full flex justify-center mt-4">
+                <common.EmptyContent />
+              </div>
+            ) : (
+              <div className="w-full flex justify-center mt-4"></div>
+            )}
+          </div>
         </>
       )}
     </>

@@ -54,7 +54,7 @@ export function Page() {
     google.maps.Marker[]
   >([])
   const [mapa, setMapa] = useState<google.maps.Map>()
-
+  const infoWindowToRemove: google.maps.InfoWindow[] = []
   function initMap() {
     const loader = new Loader({
       apiKey: 'AIzaSyA13XBWKpv6lktbNrPjhGD_2W7euKEZY1I',
@@ -122,11 +122,16 @@ export function Page() {
           if (elem.id === vehicle.carro_id) return elem
         })
         if (marker) {
-          updateVehicleMarker(marker, vehicle, mapa!)
+          updateVehicleMarker(marker, vehicle, mapa!, infoWindowToRemove)
           return
         }
 
-        createNewVehicleMarker(mapa, vehicle, allMarkerVehiclesStep)
+        createNewVehicleMarker(
+          mapa,
+          vehicle,
+          allMarkerVehiclesStep,
+          infoWindowToRemove!
+        )
       })
     const markersToAdd = allMarkerVehiclesStep.filter((markerStep) => {
       const validationMarker = allMarkerVehicles.find((elem) => {
@@ -170,7 +175,8 @@ export function Page() {
 function createNewVehicleMarker(
   map: google.maps.Map | undefined,
   vehicle: vehicle,
-  allMarkerVehiclesStep: google.maps.Marker[] | any[]
+  allMarkerVehiclesStep: google.maps.Marker[] | any[],
+  infoWindowToRemove: google.maps.InfoWindow[]
 ) {
   const marker = new google.maps.Marker({
     map,
@@ -189,6 +195,11 @@ function createNewVehicleMarker(
   })
 
   marker.addListener('click', async () => {
+    if (infoWindowToRemove) {
+      infoWindowToRemove.forEach((info) => info.close())
+      infoWindowToRemove.length = 0
+    }
+
     const addres = await getVehicleAddress(vehicle.latitude, vehicle.longitude)
     const infowindow = new google.maps.InfoWindow({
       content: `<div class='text-dark-7 w-80 m-0'>
@@ -231,8 +242,11 @@ function createNewVehicleMarker(
       <p><b>${'NOME DO MOTORISTA'}</b> </p>
       <p><b>${addres}</b> </p>
       </div>
-      <button class='bg-theme-9 py-2 dark:bg-theme-1 dark:text-white font-semibold w-full bottom-0 rounded-sm' onclick="
-      alert('Em desenvolvimento')">Ver trajeto<button>
+      <button class='bg-theme-9 dark:bg-theme-1 dark:text-white font-semibold w-full bottom-0 rounded-sm'><a href='/erp/monitoramento/trajetos/${
+        vehicle.carro_id
+      }?placa=${
+        vehicle.placa
+      }' class='flex w-full justify-center items-center h-8'>Ver trajeto</a></button>
       </div>`
     })
     infowindow.open({
@@ -240,6 +254,7 @@ function createNewVehicleMarker(
       map,
       shouldFocus: false
     })
+    infoWindowToRemove.push(infowindow)
   })
 
   allMarkerVehiclesStep.push(marker)
@@ -298,7 +313,8 @@ function centerMapInVehicle(
 function updateVehicleMarker(
   marker: google.maps.Marker,
   vehicle: vehicle,
-  map: google.maps.Map
+  map: google.maps.Map,
+  infoWindowToRemove: google.maps.InfoWindow[]
 ) {
   const currentMarkerPos = new google.maps.LatLng(
     Number(vehicle.latitude),
@@ -314,6 +330,11 @@ function updateVehicleMarker(
   google.maps.event.clearListeners(marker, 'click')
 
   marker.addListener('click', async () => {
+    if (infoWindowToRemove) {
+      infoWindowToRemove.forEach((info) => info.close())
+      infoWindowToRemove.length = 0
+    }
+
     const addres = await getVehicleAddress(vehicle.latitude, vehicle.longitude)
     const infowindow = new google.maps.InfoWindow({
       content: `<div class='text-dark-7 w-80 m-0'>
@@ -356,8 +377,11 @@ function updateVehicleMarker(
       <p><b>${'NOME DO MOTORISTA'}</b> </p>
       <p><b>${addres}</b> </p>
       </div>
-      <button class='bg-theme-9 py-2 dark:bg-theme-1 dark:text-white font-semibold w-full bottom-0 rounded-sm' onclick="
-      alert('Em desenvolvimento')">Ver trajeto<button>
+      <button class='bg-theme-9 dark:bg-theme-1 dark:text-white font-semibold w-full bottom-0 rounded-sm'><a href='/erp/monitoramento/trajetos/${
+        vehicle.carro_id
+      }?placa=${
+        vehicle.placa
+      }' class='flex w-full justify-center items-center h-8'>Ver trajeto</a></button>
       </div>`
     })
     infowindow.open({
@@ -365,6 +389,7 @@ function updateVehicleMarker(
       map,
       shouldFocus: false
     })
+    infoWindowToRemove.push(infowindow)
   })
 }
 

@@ -9,6 +9,7 @@ import {
 } from 'react'
 import * as yup from 'yup'
 import { getVehicleHistoric, getAllUserVehicles } from '../api'
+import { useRouter } from 'next/router'
 
 type vehicle = {
   crs: string
@@ -56,6 +57,8 @@ type PathContextProps = {
   softDeletePathLoading: boolean
   updatePathLoading: boolean
   pathSchema: any
+  selectedVehicle: vehicle
+  setSelectedVehicle: Dispatch<SetStateAction<vehicle | undefined>>
   coordsToCenterPointInMap: coordsToCenterMap
   setCoordsToCenterPointInMap: Dispatch<SetStateAction<coordsToCenterMap>>
   centerVehicleInMap?: (carroId: number) => void
@@ -71,8 +74,6 @@ type ProviderProps = {
 }
 
 type SlidePanelStateType = {
-  type: 'create' | 'update'
-  data?: null
   open: boolean
 }
 
@@ -81,8 +82,9 @@ export const PathContext = createContext<PathContextProps>(
 )
 
 export const PathProvider = ({ children }: ProviderProps) => {
+  const router = useRouter()
+
   const [slidePanelState, setSlidePanelState] = useState<SlidePanelStateType>({
-    type: 'create',
     open: false
   })
   const [vehicleLocationInfo, setVehicleLocationInfo] = useState()
@@ -91,10 +93,10 @@ export const PathProvider = ({ children }: ProviderProps) => {
   const [coordsToCenterMap, setCoordsToCenterMap] = useState<coordsToCenterMap>(
     {}
   )
+  const [selectedVehicle, setSelectedVehicle] = useState<vehicle>()
   const [coordsToCenterPointInMap, setCoordsToCenterPointInMap] =
     useState<coordsToCenterMap>({})
   const [allUserVehicle, setAllUserVehicle] = useState<vehicle[]>([])
-
   const [pathsLoading, setPathsLoading] = useState(false)
 
   const pathSchema = yup.object().shape({
@@ -121,7 +123,11 @@ export const PathProvider = ({ children }: ProviderProps) => {
     const responseGetUserVehicles = await getAllUserVehicles(
       'operacional@radarescolta.com'
     )
-    if (responseGetUserVehicles) setAllUserVehicle(responseGetUserVehicles)
+    if (responseGetUserVehicles) {
+      setAllUserVehicle(responseGetUserVehicles)
+      return
+    }
+    updateAllUserVehiclesLocations()
   }
   async function consultVehicleHistoric(
     carro_id: string,
@@ -157,7 +163,9 @@ export const PathProvider = ({ children }: ProviderProps) => {
         consultVehicleHistoric,
         allUserVehicle,
         coordsToCenterPointInMap,
-        setCoordsToCenterPointInMap
+        setCoordsToCenterPointInMap,
+        selectedVehicle,
+        setSelectedVehicle
       }}
     >
       {children}

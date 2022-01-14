@@ -5,15 +5,31 @@ import * as paths from '@/domains/erp/monitoring/Path'
 
 import { Loader } from '@googlemaps/js-api-loader'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { getStreetNameByLatLng } from '@/domains/erp/monitoring/api'
 
-type locationProps = {
-  latitude: string
-  longitude: string
-  ligado: number
-  data: string
-  speed: string
+type vehicle = {
   crs: string
+  data: string
   dist: string
+  latitude: string
+  ligado: number
+  longitude: string
+  speed: string
+  carro_id?: number
+  placa?: string
+  chassis?: string
+  renavan?: string
+  ano_modelo?: string
+  cor?: string
+  veiculo?: string
+  carro_fabricante?: string
+  carro_categoria?: string
+  carro_tipo?: string
+  combustivel?: string
+  ano?: string
+  frota?: string
+  imei?: string
+  date_rastreador?: string
 }
 
 export default function Trajetos() {
@@ -25,7 +41,13 @@ export default function Trajetos() {
 }
 
 export function Page() {
-  const { vehicleConsultData, coordsToCenterPointInMap } = paths.usePath()
+  const {
+    vehicleConsultData,
+    coordsToCenterPointInMap,
+    allUserVehicle,
+    selectedVehicle,
+    setSlidePanelState
+  } = paths.usePath()
   const [pointMarker, setPointMarker] = useState<
     google.maps.Marker | undefined
   >()
@@ -35,6 +57,7 @@ export function Page() {
     markers: google.maps.Marker[]
     line: google.maps.Polyline
   }>()
+  const infoWindowToRemove: google.maps.InfoWindow[] = []
 
   function initMap() {
     const loader = new Loader({
@@ -78,17 +101,23 @@ export function Page() {
 
   useEffect(() => {
     initMap()
+    setSlidePanelState({
+      open: true
+    })
   }, [])
 
   useEffect(() => {
-    if (vehicleConsultData)
+    if (vehicleConsultData?.length > 0) {
       createNewCarMarker(
+        infoWindowToRemove,
+        selectedVehicle,
         mapa!,
         google,
         vehicleConsultData,
         markersAndLine,
         setMarkersAndLine
       )
+    }
   }, [vehicleConsultData])
 
   useEffect(() => {
@@ -123,9 +152,11 @@ export function Page() {
   )
 }
 function createNewCarMarker(
+  infoWindowToRemove: google.maps.InfoWindow[],
+  selectedVehicle: vehicle,
   map: google.maps.Map,
   google: any,
-  pathCoords: locationProps[],
+  pathCoords: vehicle[],
   markersAndLine:
     | {
         markers: google.maps.Marker[]
@@ -170,6 +201,68 @@ function createNewCarMarker(
       anchor: new google.maps.Point(10, 25),
       rotation: Number(pathCoords[pathCoords.length - 1].crs)
     }
+  })
+  marker.addListener('click', async () => {
+    if (infoWindowToRemove) {
+      infoWindowToRemove.forEach((info) => info.close())
+      infoWindowToRemove.length = 0
+    }
+    const addres = await getVehicleAddress(
+      pathCoords[pathCoords.length - 1].latitude,
+      pathCoords[pathCoords.length - 1].longitude
+    )
+    const infowindow = new google.maps.InfoWindow({
+      content: `<div class='text-dark-7 w-80 m-0'>
+      <div class='grid grid-cols-3'>
+      <div class='grid-span-1 flex bg-theme-22  justify-center font-semibold rounded-l-md py-2 border-2 !border-white '> ${
+        selectedVehicle.placa
+      }</div>
+      <div class='grid-span-1  flex bg-theme-22  justify-center items-center font-semibold border-2  py-2 !border-white' >
+      <div class='mr-1 ${
+        pathCoords[pathCoords.length - 1].ligado
+          ? Number(pathCoords[pathCoords.length - 1].speed).toFixed() === '0'
+            ? 'text-theme-10'
+            : 'text-theme-9'
+          : 'text-theme-13'
+      }'>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="w-3 h-3"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+      </div><span>${
+        pathCoords[pathCoords.length - 1].ligado
+          ? Number(pathCoords[pathCoords.length - 1].speed).toFixed() === '0'
+            ? ' Parado'
+            : ' Ligado'
+          : ' Desligado'
+      }</span>
+      </div>
+      <div class='grid-span-1 flex bg-theme-22  justify-center font-semibold border-2 !border-white rounded-r-md py-2'>${Math.floor(
+        Number(pathCoords[pathCoords.length - 1].speed)
+      )} km/h</div> 
+      </div>
+      
+      <div class="my-2">
+      <p><b>Última atualização: ${new Date(
+        pathCoords[pathCoords.length - 1].data
+      ).toLocaleDateString('pt-br', {
+        dateStyle: 'short'
+      })}
+      ${new Date(pathCoords[pathCoords.length - 1].data).toLocaleTimeString(
+        'pt-br',
+        {
+          timeStyle: 'medium'
+        }
+      )}</b> </p>
+      <p><b>${selectedVehicle.veiculo}</b> </p>
+      <p><b>${'NOME DO MOTORISTA'}</b> </p>
+      <p><b>${addres}</b> </p>
+      </div>
+    </div>`
+    })
+    infowindow.open({
+      anchor: marker,
+      map,
+      shouldFocus: false
+    })
+    infoWindowToRemove.push(infowindow)
   })
 
   const markerStart = new google.maps.Marker({
@@ -233,6 +326,7 @@ function createNewCarMarker(
   function renderPolyline() {
     line.getPath().clear()
     lineForeground.getPath().clear()
+    pathCoords.reverse()
     let statusVehicle = pathCoords[0].ligado
     let timeLastStop = new Date(pathCoords[0].data)
 
@@ -258,7 +352,14 @@ function createNewCarMarker(
 
         durationMs = hours + ':' + minutes + ':' + seconds
       }
-      createMarkerWhitInfo(vehicle, pathCoords[index - 1], stop, durationMs)
+      createMarkerWhitInfo(
+        vehicle,
+        pathCoords[index - 1],
+        stop,
+        durationMs,
+        selectedVehicle,
+        infoWindowToRemove
+      )
 
       const arrival = new google.maps.LatLng(
         Number(vehicle.latitude),
@@ -270,40 +371,45 @@ function createNewCarMarker(
   }
 
   function createMarkerWhitInfo(
-    vehicle: locationProps,
-    previousPosition: locationProps,
+    vehicle: vehicle,
+    previousPosition: vehicle,
     stop: boolean,
-    downTime: number
+    downTime: number,
+    selectedVehicle: vehicle,
+    infoWindowToRemove: google.maps.InfoWindow[]
   ) {
-    let content: string
-    if (downTime !== 0) {
-      content = `<div class='text-dark-7'>
-      <p> <b>Data e hora: </b> 
-      ${new Date(vehicle.data).toLocaleDateString('pt-br', {
-        dateStyle: 'short'
-      })} ${new Date(vehicle.data).toLocaleTimeString('pt-br', {
-        timeStyle: 'medium'
-      })}
-      </p>
-      <p><b>Tempo parado: </b>${downTime}</p>
-      </div> `
-    } else {
-      content = `<div class='text-dark-7'>
-      <p> <b>Data e hora: </b> 
-      ${new Date(vehicle.data).toLocaleDateString('pt-br', {
-        dateStyle: 'short'
-      })} ${new Date(vehicle.data).toLocaleTimeString('pt-br', {
-        timeStyle: 'medium'
-      })}
-      </p>
-      <p><b>Velocidade:</b> ${Math.floor(Number(vehicle.speed))} Km/H</p>
-      </div> `
+    let events = ''
+    const icon = {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 5,
+      strokeWeight: 1,
+      fillColor:
+        previousPosition === undefined
+          ? '#000'
+          : stop && Number(vehicle.speed) < 1
+          ? '#00ffdd'
+          : stop
+          ? '#2600ff'
+          : Number(vehicle.speed) > 80
+          ? '#ff8800'
+          : '#000',
+      fillOpacity: 1
     }
-
+    if (downTime !== 0) {
+      events += `
+      ${downTime} <span>tempo parado</span>`
+    } else if (Number(vehicle.speed) > 80) {
+      icon.path =
+        'M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z'
+      icon.scale = 1.25
+      events += `
+      <span>Velocidade:</span> ${Math.floor(
+        Number(vehicle.speed)
+      )} <span>Km/H</span>
+      `
+    }
+    if (events === '') events = '<span>Não há evento registrado.</span> '
     // if (true /*Number(vehicle.speed) > 80 || stop*/) {
-    const infowindow = new google.maps.InfoWindow({
-      content
-    })
 
     const markerlocal = new google.maps.Marker({
       position: {
@@ -312,30 +418,70 @@ function createNewCarMarker(
       },
       map,
       zIndex: 1,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 5,
-        strokeWeight: 1,
-        fillColor:
-          previousPosition === undefined
-            ? '#000'
-            : stop
-            ? '#2600ff'
-            : Number(vehicle.speed) > 80
-            ? '#ff8800'
-            : '#000',
-        fillOpacity: 1
-      }
+      icon
     })
-    markerlocal.addListener('click', () => {
-      // const icon = markerlocal.getIcon()
-      // icon.strokeColor = 'yellow'
-      // markerlocal.setIcon(icon)
+    markerlocal.addListener('click', async () => {
+      if (infoWindowToRemove) {
+        infoWindowToRemove.forEach((info) => info.close())
+        infoWindowToRemove.length = 0
+      }
+      const addres = await getVehicleAddress(
+        vehicle.latitude,
+        vehicle.longitude
+      )
+      const infowindow = new google.maps.InfoWindow({
+        content: `<div class='text-dark-7 w-80 m-0'>
+        <div class='grid grid-cols-3'>
+        <div class='grid-span-1 flex bg-theme-22  justify-center font-semibold rounded-l-md py-2 border-2 !border-white '> ${
+          selectedVehicle.placa
+        }</div>
+        <div class='grid-span-1  flex bg-theme-22  justify-center items-center font-semibold border-2  py-2 !border-white' >
+        <div class='mr-1 ${
+          vehicle.ligado
+            ? Number(vehicle.speed).toFixed() === '0'
+              ? 'text-theme-10'
+              : 'text-theme-9'
+            : 'text-theme-13'
+        }'>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="w-3 h-3"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+        </div><span>${
+          vehicle.ligado
+            ? Number(vehicle.speed).toFixed() === '0'
+              ? ' Parado'
+              : ' Ligado'
+            : ' Desligado'
+        }</span>
+        </div>
+        <div class='grid-span-1 flex bg-theme-22  justify-center font-semibold border-2 !border-white rounded-r-md py-2'>${Math.floor(
+          Number(vehicle.speed)
+        )} km/h</div> 
+        </div>
+        
+        <div class="my-2">
+        <p><b>Última atualização: ${new Date(vehicle.data).toLocaleDateString(
+          'pt-br',
+          {
+            dateStyle: 'short'
+          }
+        )}
+        ${new Date(vehicle.data).toLocaleTimeString('pt-br', {
+          timeStyle: 'medium'
+        })}</b> </p>
+        <p><b>${selectedVehicle.veiculo}</b> </p>
+        <p><b>${'NOME DO MOTORISTA'}</b> </p>
+        <p><b>${addres}</b> </p>
+        </div>
+        
+      <div> <b>Eventos:</b> </br>
+      ${events}</div>
+      </div>`
+      })
       infowindow.open({
         anchor: markerlocal,
         map,
         shouldFocus: false
       })
+      infoWindowToRemove.push(infowindow)
     })
 
     markers.push(markerlocal)
@@ -388,4 +534,8 @@ function animateIconPolyline(line: google.maps.Polyline) {
     icons[0].offset = count / 2 + '%'
     line.set('icons', icons)
   }, 200)
+}
+async function getVehicleAddress(lat: string, lng: string) {
+  const response = await getStreetNameByLatLng(lat, lng)
+  return response.results[0].formatted_address
 }
